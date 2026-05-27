@@ -1,4 +1,4 @@
-const CACHE = "coudeprogres-v2";
+const CACHE = "coudeprogres-v3";
 const FILES = [
   "./",
   "./index.html",

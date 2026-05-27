@@ -44,6 +44,7 @@ Une fois installée, l'application fonctionne hors ligne. Les données saisies s
 
 - Le chiffrement utilise `AES-GCM` avec une clé dérivée de la phrase secrète par `PBKDF2-SHA-256`.
 - La phrase secrète n'est pas stockée. Sans elle, il n'est pas possible de relire une sauvegarde ou le carnet local.
+- En cas de perte de la phrase secrète, l'écran de déverrouillage permet de repartir de zéro en supprimant définitivement le carnet chiffré inaccessible.
 - Après plus de cinq minutes en arrière-plan, l'application demande de nouveau la phrase secrète.
 - Vider les données Safari ou supprimer le stockage du site efface le carnet local : effectuer régulièrement une sauvegarde chiffrée.
 - CoudeProgres est un carnet de suivi et de motivation, pas un outil médical. Les exercices et décisions de soin restent ceux convenus avec le médecin ou le kinésithérapeute.

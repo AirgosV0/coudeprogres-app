@@ -51,7 +51,10 @@ function bindEvents() {
   $("restore-form").addEventListener("submit", restoreBackup);
   $("show-import-first").addEventListener("click", showRestore);
   $("show-import-locked").addEventListener("click", showRestore);
+  $("show-reset").addEventListener("click", showReset);
   $("cancel-restore").addEventListener("click", showLockedHome);
+  $("cancel-reset").addEventListener("click", showLockedHome);
+  $("confirm-reset").addEventListener("click", resetLostPassphrase);
   $("lock-button").addEventListener("click", lock);
   $("planning-form").addEventListener("submit", savePlanning);
   $("report-form").addEventListener("submit", saveReport);
@@ -103,6 +106,7 @@ function showLockedHome() {
   $("create-vault-form").classList.toggle("hidden", hasData);
   $("unlock-form").classList.toggle("hidden", !hasData);
   $("restore-form").classList.add("hidden");
+  $("reset-panel").classList.add("hidden");
   $("unlock-error").classList.add("hidden");
 }
 
@@ -110,6 +114,27 @@ function showRestore() {
   $("create-vault-form").classList.add("hidden");
   $("unlock-form").classList.add("hidden");
   $("restore-form").classList.remove("hidden");
+  $("reset-panel").classList.add("hidden");
+}
+
+function showReset() {
+  $("create-vault-form").classList.add("hidden");
+  $("unlock-form").classList.add("hidden");
+  $("restore-form").classList.add("hidden");
+  $("reset-panel").classList.remove("hidden");
+}
+
+function resetLostPassphrase() {
+  const confirmed = window.confirm(
+    "Confirmer la suppression définitive du carnet chiffré de cet appareil ? Cette action est irréversible."
+  );
+  if (!confirmed) return;
+  localStorage.removeItem(STORAGE_KEY);
+  envelope = null;
+  activeKey = null;
+  journal = null;
+  showLockedHome();
+  notify("Ancien carnet effacé. Vous pouvez créer un nouvel espace privé.");
 }
 
 async function createPrivateSpace(event) {

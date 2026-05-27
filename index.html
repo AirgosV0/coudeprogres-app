@@ -50,6 +50,7 @@
           <p id="unlock-error" class="error hidden">Phrase secrète incorrecte.</p>
           <button class="primary" type="submit">Ouvrir CoudeProgres</button>
           <button id="show-import-locked" class="text-button" type="button">Restaurer une sauvegarde</button>
+          <button id="show-reset" class="text-button delete" type="button">Phrase secrète perdue ? Repartir de zéro</button>
         </form>
 
         <form id="restore-form" class="card hidden">
@@ -60,6 +61,14 @@
           <button class="primary" type="submit">Importer</button>
           <button id="cancel-restore" class="text-button" type="button">Annuler</button>
         </form>
+
+        <section id="reset-panel" class="card caution hidden">
+          <h2>Repartir de zéro</h2>
+          <p>Sans votre phrase secrète, vos données actuelles ne peuvent pas être relues. Repartir de zéro effacera définitivement le carnet chiffré présent sur cet appareil.</p>
+          <p class="note">Une sauvegarde chiffrée ne pourra elle aussi être relue qu'avec l'ancienne phrase secrète.</p>
+          <button id="confirm-reset" class="primary danger-button" type="button">Effacer le carnet et recommencer</button>
+          <button id="cancel-reset" class="text-button" type="button">Annuler</button>
+        </section>
       </section>
 
       <section id="app" class="hidden">
