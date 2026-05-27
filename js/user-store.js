@@ -1,3 +1,5 @@
+import { createId } from "./platform.js";
+
 export const LEGACY_VAULT_KEY = "coudeprogres.vault.v1";
 export const USERS_KEY = "coudeprogres.users.v1";
 export const SELECTED_USER_KEY = "coudeprogres.selected-user.v1";
@@ -41,7 +43,7 @@ export function createProfile(name, envelope, storage = localStorage) {
   const safeName = name.trim();
   if (!safeName) throw new Error("Indiquez un nom pour cet utilisateur.");
   const profile = {
-    id: crypto.randomUUID(),
+    id: createId(),
     name: safeName,
     createdAt: new Date().toISOString()
   };

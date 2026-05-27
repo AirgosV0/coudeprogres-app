@@ -1,4 +1,4 @@
-const CACHE = "coudeprogres-v5";
+const CACHE = "coudeprogres-v6";
 const FILES = [
   "./",
   "./index.html",
@@ -8,7 +8,8 @@ const FILES = [
   "./js/app.js",
   "./js/domain.js",
   "./js/crypto-store.js",
-  "./js/user-store.js"
+  "./js/user-store.js",
+  "./js/platform.js"
 ];
 
 self.addEventListener("install", event => {

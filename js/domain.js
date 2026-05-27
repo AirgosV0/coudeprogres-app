@@ -1,3 +1,5 @@
+import { createId } from "./platform.js";
+
 export const TYPES = {
   kine: "Séance de kiné",
   auto: "Autorééducation",
@@ -37,7 +39,7 @@ function normalizeEntry(entry) {
 
 export function makePlannedEntry(values, existingId = "") {
   return {
-    id: existingId || crypto.randomUUID(),
+    id: existingId || createId(),
     type: values.type,
     status: "planned",
     date: values.date,
@@ -58,7 +60,7 @@ export function makePlannedEntry(values, existingId = "") {
 export function makeReportEntry(values, existing = {}) {
   return {
     ...existing,
-    id: existing.id || crypto.randomUUID(),
+    id: existing.id || createId(),
     type: values.type,
     status: "completed",
     date: values.date,
@@ -186,13 +188,13 @@ export function exportCsv(entries) {
 }
 
 function csvCell(value) {
-  return `"${String(value ?? "").replaceAll('"', '""')}"`;
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
 }
 
 export function exportIcs(entries) {
   const events = entries.filter(isAppointment);
   const body = events.map(entry => {
-    const day = entry.date.replaceAll("-", "");
+    const day = entry.date.replace(/-/g, "");
     const when = entry.time
       ? `DTSTART:${day}T${entry.time.replace(":", "")}00`
       : `DTSTART;VALUE=DATE:${day}`;
@@ -219,7 +221,7 @@ function isAppointment(entry) {
 }
 
 function icsText(value) {
-  return value.replaceAll("\\", "\\\\").replaceAll(";", "\\;").replaceAll(",", "\\,").replaceAll("\n", "\\n");
+  return value.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
 }
 
 export function isoToday() {

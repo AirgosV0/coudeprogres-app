@@ -84,6 +84,7 @@ function bindEvents() {
   $("filter-status").addEventListener("change", renderRecords);
   $("filter-month").addEventListener("change", renderRecords);
   $("filter-search").addEventListener("input", renderRecords);
+  $("export-backup-locked").addEventListener("click", exportBackup);
   $("export-backup").addEventListener("click", exportBackup);
   $("export-csv").addEventListener("click", downloadCsv);
   $("export-calendar").addEventListener("click", downloadCalendar);
@@ -184,16 +185,17 @@ async function createPrivateSpace(event) {
 
 async function unlock(event) {
   event.preventDefault();
+  const form = event.currentTarget;
   let result;
   try {
-    result = await unlockVault(envelope, event.currentTarget.elements.passphrase.value);
+    result = await unlockVault(envelope, form.elements.passphrase.value);
     activeKey = result.key;
     journal = normalizeJournal(result.journal);
   } catch {
     $("unlock-error").classList.remove("hidden");
     return;
   }
-  event.currentTarget.reset();
+  form.reset();
   try {
     openApp();
   } catch (error) {
@@ -487,6 +489,7 @@ function emptyMessage() {
 }
 
 function exportBackup() {
+  if (!currentProfile || !envelope) return;
   download(`coudeprogres-sauvegarde-${safeFilename(currentProfile.name)}-${isoToday()}.json`, JSON.stringify(envelope, null, 2), "application/json");
   notify("Sauvegarde chiffrée téléchargée.");
 }
@@ -507,14 +510,15 @@ function confirmClearExport() {
 
 async function restoreBackup(event) {
   event.preventDefault();
+  const form = event.currentTarget;
   const file = $("restore-file").files[0];
   try {
     const imported = JSON.parse(await file.text());
     validateEnvelope(imported);
     envelope = imported;
-    currentProfile = createProfile(event.currentTarget.elements.profileName.value, envelope);
+    currentProfile = createProfile(form.elements.profileName.value, envelope);
     profiles = migrateLegacyVault();
-    $("restore-form").reset();
+    form.reset();
     showLockedHome();
     notify("Sauvegarde importée dans un nouvel utilisateur. Déverrouillez-la avec sa phrase secrète.");
   } catch (error) {
@@ -528,10 +532,13 @@ function safeFilename(value) {
 
 function download(filename, content, type) {
   const link = document.createElement("a");
-  link.href = URL.createObjectURL(new Blob([content], { type }));
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  link.href = url;
   link.download = filename;
+  document.body.append(link);
   link.click();
-  URL.revokeObjectURL(link.href);
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function notify(message) {
@@ -542,5 +549,5 @@ function notify(message) {
 }
 
 function escapeHtml(value) {
-  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }

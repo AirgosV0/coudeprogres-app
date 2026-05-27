@@ -6,3 +6,4 @@ coudeprogres-sauvegarde-*.json
 coudeprogres-liste-*.csv
 coudeprogres-rendez-vous-*.ics
 *.coudeprogres-backup.json
+/les extractions de saisies/

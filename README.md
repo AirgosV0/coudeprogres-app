@@ -16,7 +16,7 @@ Elle distingue désormais deux moments :
 - **Planifier** un futur rendez-vous médical ou de kinésithérapie avec la date et l'heure ;
 - **Faire le bilan** après la séance pour noter durée, douleur, ressenti, mobilité et progrès notable.
 
-L'accueil rappelle les rendez-vous passés dont le bilan reste à compléter. Il présente aussi les progrès issus des bilans, sans confondre un rendez-vous simplement prévu avec une séance réellement effectuée. L'application comprend également un calendrier mensuel, un historique filtrable par sujet, statut et mois, une sauvegarde chiffrée restaurable, un export CSV et un export calendrier.
+L'accueil rappelle les rendez-vous passés dont le bilan reste à compléter. Il présente aussi les progrès issus des bilans, sans confondre un rendez-vous simplement prévu avec une séance réellement effectuée. L'application comprend également un calendrier mensuel, un historique filtrable par sujet, statut et mois, une sauvegarde chiffrée téléchargeable même depuis l'écran verrouillé, un export CSV et un export calendrier.
 
 Les exports CSV et calendrier ne sont pas chiffrés. La sauvegarde `.json`, elle, reste chiffrée.
 
@@ -39,6 +39,8 @@ Puis ouvrir `http://localhost:4173`.
 Pour l'installer sur un iPhone, les fichiers doivent être publiés sur une adresse HTTPS privée ou maîtrisée. Ouvrir ensuite cette adresse dans Safari, toucher **Partager**, puis **Sur l'écran d'accueil**.
 
 Une fois installée, l'application fonctionne hors ligne. Les données saisies sur l'iPhone restent sur l'iPhone : elles ne se synchronisent pas automatiquement avec un ordinateur ou un autre téléphone. La sauvegarde chiffrée permet de les transférer volontairement. Lors de l'import, elle est ajoutée dans un nouvel utilisateur et ne remplace pas un carnet déjà présent.
+
+Si l'ouverture échoue sur l'iPhone, télécharger d'abord la sauvegarde chiffrée depuis l'écran verrouillé : cette opération conserve le carnet local et fournit une copie de secours avant toute investigation.
 
 ## Protection et limites
 
