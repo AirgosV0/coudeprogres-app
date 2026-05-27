@@ -65,7 +65,7 @@
       <section id="app" class="hidden">
         <nav class="tabs" aria-label="Sections">
           <button class="tab active" data-view="today" type="button">Aujourd'hui</button>
-          <button class="tab" data-view="add" type="button">Ajouter</button>
+          <button class="tab" data-view="plan" type="button">Planifier</button>
           <button class="tab" data-view="calendar" type="button">Calendrier</button>
           <button class="tab" data-view="records" type="button">Historique</button>
           <button class="tab" data-view="settings" type="button">Données</button>
@@ -80,68 +80,109 @@
           <div id="dashboard-cards" class="metrics"></div>
           <article class="card">
             <div class="section-title">
-              <h2>À venir</h2>
-              <button class="text-button goto-add" type="button">+ Ajouter</button>
+              <h2>Rendez-vous à venir</h2>
+              <button class="text-button goto-plan" type="button">+ Planifier</button>
             </div>
             <div id="upcoming-list" class="empty">Aucun rendez-vous à venir.</div>
           </article>
+          <article class="card">
+            <div class="section-title">
+              <h2>Bilans à compléter</h2>
+              <button id="new-free-report" class="text-button" type="button">+ Séance libre</button>
+            </div>
+            <p class="note">Après un rendez-vous, notez ce qui a été marquant et vos progrès.</p>
+            <div id="pending-list" class="empty">Aucun bilan en attente.</div>
+          </article>
         </section>
 
-        <section id="view-add" class="view hidden">
-          <form id="entry-form" class="card form-card">
-            <input id="entry-id" type="hidden">
+        <section id="view-plan" class="view hidden">
+          <form id="planning-form" class="card form-card">
+            <input id="planning-id" type="hidden">
             <div class="section-title">
-              <h2 id="entry-form-title">Nouvelle entrée</h2>
-              <button id="cancel-edit" class="text-button hidden" type="button">Annuler</button>
+              <h2 id="planning-form-title">Planifier un rendez-vous</h2>
+              <button id="cancel-planning-edit" class="text-button hidden" type="button">Annuler</button>
             </div>
-            <label>Type
-              <select id="entry-type" required>
+            <p class="note">Première étape : indiquez simplement ce qui est prévu. Le bilan viendra après la séance.</p>
+            <label>Rendez-vous
+              <select id="planning-type" required>
                 <option value="kine">Séance de kiné</option>
-                <option value="auto">Autorééducation</option>
                 <option value="medical">Rendez-vous médical</option>
+              </select>
+            </label>
+            <div class="row">
+              <label>Date
+                <input id="planning-date" type="date" required>
+              </label>
+              <label>Heure
+                <input id="planning-time" type="time">
+              </label>
+            </div>
+            <label>Titre (facultatif)
+              <input id="planning-title" type="text" maxlength="100" placeholder="Ex. Cabinet de kiné, contrôle radio...">
+            </label>
+            <label>Informations pratiques (facultatif)
+              <textarea id="planning-notes" rows="2" maxlength="500" placeholder="Adresse, document à apporter..."></textarea>
+            </label>
+            <button class="primary" type="submit">Ajouter à mon planning</button>
+          </form>
+        </section>
+
+        <section id="view-report" class="view hidden">
+          <form id="report-form" class="card form-card">
+            <input id="report-id" type="hidden">
+            <div class="section-title">
+              <h2 id="report-form-title">Faire le bilan</h2>
+              <button id="cancel-report" class="text-button" type="button">Annuler</button>
+            </div>
+            <p class="note">Deuxième étape : après la séance, retenez ce qui compte pour suivre votre parcours.</p>
+            <label>Type
+              <select id="report-type" required>
+                <option value="kine">Séance de kiné</option>
+                <option value="medical">Rendez-vous médical</option>
+                <option value="auto">Autorééducation</option>
                 <option value="progress">Progrès / ressenti</option>
               </select>
             </label>
             <div class="row">
               <label>Date
-                <input id="entry-date" type="date" required>
+                <input id="report-date" type="date" required>
               </label>
               <label>Heure
-                <input id="entry-time" type="time">
+                <input id="report-time" type="time">
               </label>
             </div>
-            <label>Titre
-              <input id="entry-title" type="text" maxlength="100" placeholder="Ex. Séance avec Julie, cabinet..." required>
+            <label>Titre (facultatif)
+              <input id="report-title" type="text" maxlength="100" placeholder="Ex. Séance de kiné">
             </label>
             <div class="row">
               <label>Durée (min)
-                <input id="entry-duration" type="number" min="0" max="600" inputmode="numeric">
+                <input id="report-duration" type="number" min="0" max="600" inputmode="numeric">
               </label>
               <label>Douleur (0-10)
-                <input id="entry-pain" type="number" min="0" max="10" inputmode="numeric">
+                <input id="report-pain" type="number" min="0" max="10" inputmode="numeric">
               </label>
             </div>
             <details>
               <summary>Mesures de mobilité (facultatif)</summary>
               <div class="row details-fields">
                 <label>Flexion (°)
-                  <input id="entry-flexion" type="number" min="0" max="180" inputmode="numeric">
+                  <input id="report-flexion" type="number" min="0" max="180" inputmode="numeric">
                 </label>
                 <label>Extension (°)
-                  <input id="entry-extension" type="number" min="-90" max="180" inputmode="numeric">
+                  <input id="report-extension" type="number" min="-90" max="180" inputmode="numeric">
                 </label>
               </div>
             </details>
-            <label>Ce que j'ai fait / observations
-              <textarea id="entry-details" rows="3" maxlength="1000"></textarea>
+            <label>Ce qui a été marquant
+              <textarea id="report-details" rows="3" maxlength="1000" placeholder="Exercices réalisés, gêne, conseil reçu, ressenti..."></textarea>
             </label>
-            <label>Petit progrès ou réussite du jour
-              <textarea id="entry-achievement" rows="2" maxlength="500" placeholder="Même un détail compte."></textarea>
+            <label>Progrès notable ou réussite du jour
+              <textarea id="report-achievement" rows="2" maxlength="500" placeholder="Même un petit progrès compte."></textarea>
             </label>
             <label>Prochaine étape décidée avec mon soignant
-              <textarea id="entry-next" rows="2" maxlength="500"></textarea>
+              <textarea id="report-next" rows="2" maxlength="500"></textarea>
             </label>
-            <button class="primary" type="submit">Enregistrer</button>
+            <button class="primary" type="submit">Enregistrer le bilan</button>
           </form>
         </section>
 
@@ -173,6 +214,11 @@
                 <option value="auto">Autorééducation</option>
                 <option value="medical">Rendez-vous médicaux</option>
                 <option value="progress">Progrès / ressentis</option>
+              </select>
+              <select id="filter-status" aria-label="Filtrer par statut">
+                <option value="">Planification et bilans</option>
+                <option value="planned">Planifiés</option>
+                <option value="completed">Bilans renseignés</option>
               </select>
               <input id="filter-month" type="month" aria-label="Filtrer par mois">
               <input id="filter-search" type="search" placeholder="Chercher un mot">

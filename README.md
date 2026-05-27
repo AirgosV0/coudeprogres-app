@@ -11,7 +11,12 @@ CoudeProgres est une première application mobile de suivi personnel de rééduc
 
 L'application fonctionne comme une application web installable (`PWA`) et hors ligne. Les données sont conservées uniquement dans le navigateur de l'appareil, dans un carnet chiffré par la phrase secrète choisie au premier démarrage.
 
-Elle comprend une vue d'accueil sur les sept derniers jours, un calendrier mensuel, un historique filtrable par sujet et mois, une sauvegarde chiffrée restaurable, un export CSV et un export calendrier pour les rendez-vous et séances de kiné.
+Elle distingue désormais deux moments :
+
+- **Planifier** un futur rendez-vous médical ou de kinésithérapie avec la date et l'heure ;
+- **Faire le bilan** après la séance pour noter durée, douleur, ressenti, mobilité et progrès notable.
+
+L'accueil rappelle les rendez-vous passés dont le bilan reste à compléter. Il présente aussi les progrès issus des bilans, sans confondre un rendez-vous simplement prévu avec une séance réellement effectuée. L'application comprend également un calendrier mensuel, un historique filtrable par sujet, statut et mois, une sauvegarde chiffrée restaurable, un export CSV et un export calendrier.
 
 Les exports CSV et calendrier ne sont pas chiffrés. La sauvegarde `.json`, elle, reste chiffrée.
 

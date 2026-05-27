@@ -4,16 +4,20 @@ import {
   exportCsv,
   exportIcs,
   filteredEntries,
+  makePlannedEntry,
+  makeReportEntry,
   monthCells,
+  normalizeJournal,
+  reportsToComplete,
   sevenDaySummary,
   upcomingEntries
 } from "../js/domain.js";
 
 const entries = [
-  { id: "1", type: "kine", date: "2026-04-08", time: "09:00", title: "Kiné avril", details: "", achievement: "Plus souple", nextStep: "" },
-  { id: "2", type: "kine", date: "2026-05-25", time: "", title: "Kiné mai", details: "", achievement: "", nextStep: "" },
-  { id: "3", type: "auto", date: "2026-05-27", time: "", title: "Mobilité", details: "", achievement: "Mouvement fait", nextStep: "" },
-  { id: "4", type: "medical", date: "2026-06-03", time: "14:30", title: "Contrôle", details: "", achievement: "", nextStep: "" }
+  { id: "1", status: "completed", type: "kine", date: "2026-04-08", time: "09:00", title: "Kiné avril", details: "", achievement: "Plus souple", nextStep: "" },
+  { id: "2", status: "planned", type: "kine", date: "2026-05-25", time: "", title: "Kiné mai", details: "", achievement: "", nextStep: "" },
+  { id: "3", status: "completed", type: "auto", date: "2026-05-27", time: "", title: "Mobilité", details: "", achievement: "Mouvement fait", nextStep: "" },
+  { id: "4", status: "planned", type: "medical", date: "2026-06-03", time: "14:30", title: "Contrôle", details: "", achievement: "", nextStep: "" }
 ];
 
 test("filtre les séances de kiné pour un mois demandé", () => {
@@ -24,13 +28,47 @@ test("filtre les séances de kiné pour un mois demandé", () => {
 
 test("résume les sept derniers jours avec une réussite", () => {
   const result = sevenDaySummary(entries, "2026-05-27");
-  assert.equal(result.recentCount, 2);
-  assert.equal(result.practices, 2);
+  assert.equal(result.recentCount, 1);
+  assert.equal(result.practices, 1);
   assert.match(result.message, /Mouvement fait/);
 });
 
 test("liste seulement les rendez-vous futurs utiles au tableau de bord", () => {
   assert.deepEqual(upcomingEntries(entries, "2026-05-27").map(entry => entry.id), ["4"]);
+});
+
+test("propose un bilan pour un rendez-vous planifié qui est passé", () => {
+  assert.deepEqual(reportsToComplete(entries, "2026-05-27").map(entry => entry.id), ["2"]);
+});
+
+test("transforme un rendez-vous planifié en bilan renseigné", () => {
+  const planned = makePlannedEntry({ type: "kine", date: "2026-05-27", time: "10:00", title: "Cabinet", planningNotes: "" }, "5");
+  const completed = makeReportEntry({
+    type: planned.type, date: planned.date, time: planned.time, title: planned.title,
+    duration: "30", pain: "3", flexion: "", extension: "", details: "Mobilité", achievement: "Mieux", nextStep: ""
+  }, planned);
+  assert.equal(completed.id, planned.id);
+  assert.equal(completed.status, "completed");
+  assert.equal(completed.pain, 3);
+});
+
+test("utilise le type comme titre lorsqu'il est laissé vide", () => {
+  const planned = makePlannedEntry({ type: "medical", date: "2026-06-01", time: "", title: "", planningNotes: "" });
+  const report = makeReportEntry({
+    type: "auto", date: "2026-05-27", time: "", title: "",
+    duration: "", pain: "", flexion: "", extension: "", details: "", achievement: "", nextStep: ""
+  });
+  assert.equal(planned.title, "Rendez-vous médical");
+  assert.equal(report.title, "Autorééducation");
+});
+
+test("préserve les anciennes notes en leur attribuant un statut", () => {
+  const migrated = normalizeJournal({ entries: [
+    { id: "old-plan", type: "medical", date: "2026-06-01", title: "Contrôle", details: "" },
+    { id: "old-report", type: "kine", date: "2026-05-01", title: "Séance", achievement: "Gain" }
+  ] });
+  assert.equal(migrated.entries[0].status, "planned");
+  assert.equal(migrated.entries[1].status, "completed");
 });
 
 test("le calendrier place les entrées à leur date", () => {
@@ -40,6 +78,7 @@ test("le calendrier place les entrées à leur date", () => {
 
 test("les exports incluent les données attendues", () => {
   assert.match(exportCsv(entries), /Kiné avril/);
+  assert.match(exportCsv(entries), /Planifié/);
   assert.match(exportIcs(entries), /Contrôle/);
   assert.doesNotMatch(exportIcs(entries), /Mobilité/);
 });

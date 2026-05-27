@@ -399,6 +399,16 @@ summary {
   padding: 0.18rem 0.48rem;
 }
 
+.tag.planned {
+  background: #f4edda;
+  color: #725727;
+}
+
+.tag.completed {
+  background: #e7f1f8;
+  color: #21586b;
+}
+
 .entry p {
   font-size: 0.9rem;
   margin: 0.35rem 0;
@@ -413,6 +423,11 @@ summary {
 .entry-actions button {
   font-size: 0.82rem;
   padding: 0.35rem 0;
+}
+
+.entry-actions .primary.small {
+  padding: 0.45rem 0.65rem;
+  width: auto;
 }
 
 .delete {
