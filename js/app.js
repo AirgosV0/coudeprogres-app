@@ -108,6 +108,7 @@ function showLockedHome() {
   $("restore-form").classList.add("hidden");
   $("reset-panel").classList.add("hidden");
   $("unlock-error").classList.add("hidden");
+  $("open-error").classList.add("hidden");
 }
 
 function showRestore() {
@@ -157,14 +158,24 @@ async function createPrivateSpace(event) {
 
 async function unlock(event) {
   event.preventDefault();
+  let result;
   try {
-    const result = await unlockVault(envelope, event.currentTarget.elements.passphrase.value);
+    result = await unlockVault(envelope, event.currentTarget.elements.passphrase.value);
     activeKey = result.key;
     journal = normalizeJournal(result.journal);
-    event.currentTarget.reset();
-    openApp();
   } catch {
     $("unlock-error").classList.remove("hidden");
+    return;
+  }
+  event.currentTarget.reset();
+  try {
+    openApp();
+  } catch (error) {
+    console.error("Impossible d'afficher le carnet déverrouillé.", error);
+    $("welcome").classList.remove("hidden");
+    $("app").classList.add("hidden");
+    $("unlock-form").classList.remove("hidden");
+    $("open-error").classList.remove("hidden");
   }
 }
 

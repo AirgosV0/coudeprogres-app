@@ -4,7 +4,7 @@ export const STORAGE_KEY = "coudeprogres.vault.v1";
 
 export async function createVault(journal, passphrase) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
-  const key = await deriveKey(passphrase, salt, ITERATIONS);
+  const key = await deriveKey(canonicalPassphrase(passphrase), salt, ITERATIONS);
   return {
     key,
     envelope: await encryptJournal(journal, key, { salt: encode(salt), iterations: ITERATIONS })
@@ -13,9 +13,17 @@ export async function createVault(journal, passphrase) {
 
 export async function unlockVault(envelope, passphrase) {
   validateEnvelope(envelope);
-  const key = await deriveKey(passphrase, decode(envelope.salt), envelope.iterations);
-  const journal = await decryptJournal(envelope, key);
-  return { key, journal };
+  const candidates = [...new Set([passphrase, canonicalPassphrase(passphrase)])];
+  for (const candidate of candidates) {
+    try {
+      const key = await deriveKey(candidate, decode(envelope.salt), envelope.iterations);
+      const journal = await decryptJournal(envelope, key);
+      return { key, journal };
+    } catch {
+      // Try the normalized phrase for vaults created before normalization was added.
+    }
+  }
+  throw new Error("Phrase secrète incorrecte.");
 }
 
 export async function encryptJournal(journal, key, sourceEnvelope) {
@@ -71,6 +79,10 @@ async function deriveKey(passphrase, salt, iterations) {
     false,
     ["encrypt", "decrypt"]
   );
+}
+
+function canonicalPassphrase(passphrase) {
+  return passphrase.normalize("NFC").trim();
 }
 
 function encode(bytes) {

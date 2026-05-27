@@ -47,7 +47,8 @@
           <label>Phrase secrète
             <input name="passphrase" type="password" required autocomplete="current-password">
           </label>
-          <p id="unlock-error" class="error hidden">Phrase secrète incorrecte.</p>
+          <p id="unlock-error" class="error hidden">Phrase secrète incorrecte, ou carnet illisible sur cet appareil.</p>
+          <p id="open-error" class="error hidden">Le carnet a été déverrouillé, mais l'affichage n'a pas pu s'ouvrir. Rechargez l'application pour obtenir sa dernière version.</p>
           <button class="primary" type="submit">Ouvrir CoudeProgres</button>
           <button id="show-import-locked" class="text-button" type="button">Restaurer une sauvegarde</button>
           <button id="show-reset" class="text-button delete" type="button">Phrase secrète perdue ? Repartir de zéro</button>

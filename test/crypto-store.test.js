@@ -22,3 +22,9 @@ test("les modifications restent lisibles aprÃ¨s un nouvel enregistrement chiffrÃ
   const reopened = await unlockVault(saved, "phrase-secrete-fiable");
   assert.deepEqual(reopened.journal, changed);
 });
+
+test("ignore les espaces accidentels au bord de la phrase pour un nouveau carnet", async () => {
+  const { envelope } = await createVault({ version: 1, entries: [] }, "  phrase fiable  ");
+  const reopened = await unlockVault(envelope, "phrase fiable");
+  assert.deepEqual(reopened.journal.entries, []);
+});
