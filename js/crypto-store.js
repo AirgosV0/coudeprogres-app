@@ -1,7 +1,5 @@
 const ITERATIONS = 310000;
 
-export const STORAGE_KEY = "coudeprogres.vault.v1";
-
 export async function createVault(journal, passphrase) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const key = await deriveKey(canonicalPassphrase(passphrase), salt, ITERATIONS);
@@ -81,7 +79,7 @@ async function deriveKey(passphrase, salt, iterations) {
   );
 }
 
-function canonicalPassphrase(passphrase) {
+export function canonicalPassphrase(passphrase) {
   return passphrase.normalize("NFC").trim();
 }
 

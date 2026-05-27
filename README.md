@@ -9,7 +9,7 @@ CoudeProgres est une première application mobile de suivi personnel de rééduc
 
 ## V1
 
-L'application fonctionne comme une application web installable (`PWA`) et hors ligne. Les données sont conservées uniquement dans le navigateur de l'appareil, dans un carnet chiffré par la phrase secrète choisie au premier démarrage.
+L'application fonctionne comme une application web installable (`PWA`) et hors ligne. Les données sont conservées uniquement dans le navigateur de l'appareil. Chaque utilisateur possède son propre carnet chiffré par sa phrase secrète ; changer d'utilisateur ne remplace pas les données d'un autre.
 
 Elle distingue désormais deux moments :
 
@@ -38,14 +38,14 @@ Puis ouvrir `http://localhost:4173`.
 
 Pour l'installer sur un iPhone, les fichiers doivent être publiés sur une adresse HTTPS privée ou maîtrisée. Ouvrir ensuite cette adresse dans Safari, toucher **Partager**, puis **Sur l'écran d'accueil**.
 
-Une fois installée, l'application fonctionne hors ligne. Les données saisies sur l'iPhone restent sur l'iPhone : elles ne se synchronisent pas automatiquement avec un ordinateur ou un autre téléphone. La sauvegarde chiffrée permet de les transférer volontairement.
+Une fois installée, l'application fonctionne hors ligne. Les données saisies sur l'iPhone restent sur l'iPhone : elles ne se synchronisent pas automatiquement avec un ordinateur ou un autre téléphone. La sauvegarde chiffrée permet de les transférer volontairement. Lors de l'import, elle est ajoutée dans un nouvel utilisateur et ne remplace pas un carnet déjà présent.
 
 ## Protection et limites
 
 - Le chiffrement utilise `AES-GCM` avec une clé dérivée de la phrase secrète par `PBKDF2-SHA-256`.
 - La phrase secrète n'est pas stockée. Sans elle, il n'est pas possible de relire une sauvegarde ou le carnet local.
 - Les espaces placés involontairement avant ou après une nouvelle phrase secrète sont ignorés.
-- En cas de perte de la phrase secrète, l'écran de déverrouillage permet de repartir de zéro en supprimant définitivement le carnet chiffré inaccessible.
+- En cas de perte de la phrase secrète, l'écran de déverrouillage permet de supprimer uniquement le carnet de l'utilisateur concerné.
 - Après plus de cinq minutes en arrière-plan, l'application demande de nouveau la phrase secrète.
 - Vider les données Safari ou supprimer le stockage du site efface le carnet local : effectuer régulièrement une sauvegarde chiffrée.
 - CoudeProgres est un carnet de suivi et de motivation, pas un outil médical. Les exercices et décisions de soin restent ceux convenus avec le médecin ou le kinésithérapeute.

@@ -30,7 +30,10 @@
         </div>
 
         <form id="create-vault-form" class="card hidden">
-          <h2>Créer mon espace privé</h2>
+          <h2>Créer un utilisateur</h2>
+          <label>Nom de l'utilisateur
+            <input name="profileName" type="text" maxlength="80" required autocomplete="name">
+          </label>
           <label>Phrase secrète
             <input name="passphrase" type="password" minlength="8" required autocomplete="new-password">
           </label>
@@ -39,23 +42,32 @@
           </label>
           <p class="note">Elle n'est jamais stockée. Si vous la perdez, vos notes ne pourront pas être récupérées.</p>
           <button class="primary" type="submit">Créer et commencer</button>
+          <button id="cancel-create-user" class="text-button hidden" type="button">Annuler</button>
           <button id="show-import-first" class="text-button" type="button">Restaurer une sauvegarde</button>
         </form>
 
         <form id="unlock-form" class="card hidden">
           <h2>Déverrouiller</h2>
+          <label>Utilisateur
+            <select id="profile-select" name="profile"></select>
+          </label>
           <label>Phrase secrète
             <input name="passphrase" type="password" required autocomplete="current-password">
           </label>
           <p id="unlock-error" class="error hidden">Phrase secrète incorrecte, ou carnet illisible sur cet appareil.</p>
           <p id="open-error" class="error hidden">Le carnet a été déverrouillé, mais l'affichage n'a pas pu s'ouvrir. Rechargez l'application pour obtenir sa dernière version.</p>
           <button class="primary" type="submit">Ouvrir CoudeProgres</button>
+          <button id="show-create-user" class="text-button" type="button">Créer un autre utilisateur</button>
           <button id="show-import-locked" class="text-button" type="button">Restaurer une sauvegarde</button>
           <button id="show-reset" class="text-button delete" type="button">Phrase secrète perdue ? Repartir de zéro</button>
         </form>
 
         <form id="restore-form" class="card hidden">
           <h2>Restaurer une sauvegarde</h2>
+          <p class="note">La sauvegarde sera ajoutée comme un utilisateur séparé : aucun carnet existant ne sera remplacé.</p>
+          <label>Nom de l'utilisateur restauré
+            <input name="profileName" type="text" maxlength="80" required autocomplete="name">
+          </label>
           <label>Fichier chiffré CoudeProgres
             <input id="restore-file" type="file" accept=".json,application/json" required>
           </label>
@@ -65,7 +77,7 @@
 
         <section id="reset-panel" class="card caution hidden">
           <h2>Repartir de zéro</h2>
-          <p>Sans votre phrase secrète, vos données actuelles ne peuvent pas être relues. Repartir de zéro effacera définitivement le carnet chiffré présent sur cet appareil.</p>
+          <p>Sans votre phrase secrète, les données de cet utilisateur ne peuvent pas être relues. Repartir de zéro effacera définitivement son carnet chiffré présent sur cet appareil.</p>
           <p class="note">Une sauvegarde chiffrée ne pourra elle aussi être relue qu'avec l'ancienne phrase secrète.</p>
           <button id="confirm-reset" class="primary danger-button" type="button">Effacer le carnet et recommencer</button>
           <button id="cancel-reset" class="text-button" type="button">Annuler</button>

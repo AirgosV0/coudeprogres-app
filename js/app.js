@@ -18,15 +18,26 @@ import {
   upcomingEntries
 } from "./domain.js";
 import {
-  STORAGE_KEY,
+  canonicalPassphrase,
   createVault,
   encryptJournal,
   unlockVault,
   validateEnvelope
 } from "./crypto-store.js";
+import {
+  createProfile,
+  deleteProfile,
+  loadVault,
+  migrateLegacyVault,
+  saveVault,
+  selectProfile,
+  selectedProfile
+} from "./user-store.js";
 
 const $ = id => document.getElementById(id);
-let envelope = loadEnvelope();
+let profiles = migrateLegacyVault();
+let currentProfile = selectedProfile(profiles);
+let envelope = currentProfile ? loadVault(currentProfile.id) : null;
 let activeKey = null;
 let journal = null;
 let toastTimer = null;
@@ -51,6 +62,9 @@ function bindEvents() {
   $("restore-form").addEventListener("submit", restoreBackup);
   $("show-import-first").addEventListener("click", showRestore);
   $("show-import-locked").addEventListener("click", showRestore);
+  $("show-create-user").addEventListener("click", showCreateUser);
+  $("cancel-create-user").addEventListener("click", showLockedHome);
+  $("profile-select").addEventListener("change", changeProfile);
   $("show-reset").addEventListener("click", showReset);
   $("cancel-restore").addEventListener("click", showLockedHome);
   $("cancel-reset").addEventListener("click", showLockedHome);
@@ -99,7 +113,8 @@ function bindEvents() {
 }
 
 function showLockedHome() {
-  const hasData = Boolean(envelope);
+  refreshProfiles();
+  const hasData = Boolean(currentProfile && envelope);
   $("welcome").classList.remove("hidden");
   $("app").classList.add("hidden");
   $("lock-button").classList.add("hidden");
@@ -118,6 +133,14 @@ function showRestore() {
   $("reset-panel").classList.add("hidden");
 }
 
+function showCreateUser() {
+  $("create-vault-form").classList.remove("hidden");
+  $("unlock-form").classList.add("hidden");
+  $("restore-form").classList.add("hidden");
+  $("reset-panel").classList.add("hidden");
+  $("cancel-create-user").classList.toggle("hidden", profiles.length === 0);
+}
+
 function showReset() {
   $("create-vault-form").classList.add("hidden");
   $("unlock-form").classList.add("hidden");
@@ -126,23 +149,25 @@ function showReset() {
 }
 
 function resetLostPassphrase() {
+  if (!currentProfile) return;
   const confirmed = window.confirm(
-    "Confirmer la suppression définitive du carnet chiffré de cet appareil ? Cette action est irréversible."
+    `Confirmer la suppression définitive du carnet chiffré de ${currentProfile.name} ? Cette action est irréversible.`
   );
   if (!confirmed) return;
-  localStorage.removeItem(STORAGE_KEY);
-  envelope = null;
+  profiles = deleteProfile(currentProfile.id);
+  currentProfile = selectedProfile(profiles);
+  envelope = currentProfile ? loadVault(currentProfile.id) : null;
   activeKey = null;
   journal = null;
   showLockedHome();
-  notify("Ancien carnet effacé. Vous pouvez créer un nouvel espace privé.");
+  notify("Carnet effacé. Les autres utilisateurs éventuels sont conservés.");
 }
 
 async function createPrivateSpace(event) {
   event.preventDefault();
   const form = event.currentTarget;
   const passphrase = form.elements.passphrase.value;
-  if (passphrase !== form.elements.confirmation.value) {
+  if (canonicalPassphrase(passphrase) !== canonicalPassphrase(form.elements.confirmation.value)) {
     notify("Les deux phrases secrètes ne correspondent pas.");
     return;
   }
@@ -150,7 +175,8 @@ async function createPrivateSpace(event) {
   const created = await createVault(journal, passphrase);
   envelope = created.envelope;
   activeKey = created.key;
-  storeEnvelope();
+  currentProfile = createProfile(form.elements.profileName.value, envelope);
+  profiles = migrateLegacyVault();
   form.reset();
   openApp();
   notify("Votre espace privé est prêt.");
@@ -203,16 +229,27 @@ async function persist() {
 }
 
 function storeEnvelope() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope));
+  if (!currentProfile) throw new Error("Aucun utilisateur sélectionné.");
+  saveVault(currentProfile.id, envelope);
 }
 
-function loadEnvelope() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : null;
-  } catch {
-    return null;
-  }
+function refreshProfiles() {
+  profiles = migrateLegacyVault();
+  currentProfile = selectedProfile(profiles);
+  envelope = currentProfile ? loadVault(currentProfile.id) : null;
+  $("profile-select").innerHTML = profiles
+    .map(profile => `<option value="${profile.id}">${escapeHtml(profile.name)}</option>`)
+    .join("");
+  if (currentProfile) $("profile-select").value = currentProfile.id;
+}
+
+function changeProfile(event) {
+  selectProfile(event.currentTarget.value);
+  currentProfile = selectedProfile(profiles);
+  envelope = currentProfile ? loadVault(currentProfile.id) : null;
+  activeKey = null;
+  journal = null;
+  $("unlock-error").classList.add("hidden");
 }
 
 async function savePlanning(event) {
@@ -450,7 +487,7 @@ function emptyMessage() {
 }
 
 function exportBackup() {
-  download(`coudeprogres-sauvegarde-${isoToday()}.json`, JSON.stringify(envelope, null, 2), "application/json");
+  download(`coudeprogres-sauvegarde-${safeFilename(currentProfile.name)}-${isoToday()}.json`, JSON.stringify(envelope, null, 2), "application/json");
   notify("Sauvegarde chiffrée téléchargée.");
 }
 
@@ -474,15 +511,19 @@ async function restoreBackup(event) {
   try {
     const imported = JSON.parse(await file.text());
     validateEnvelope(imported);
-    if (envelope && !window.confirm("Remplacer le carnet présent sur cet appareil par cette sauvegarde ?")) return;
     envelope = imported;
-    storeEnvelope();
+    currentProfile = createProfile(event.currentTarget.elements.profileName.value, envelope);
+    profiles = migrateLegacyVault();
     $("restore-form").reset();
     showLockedHome();
-    notify("Sauvegarde importée. Déverrouillez-la avec sa phrase secrète.");
+    notify("Sauvegarde importée dans un nouvel utilisateur. Déverrouillez-la avec sa phrase secrète.");
   } catch (error) {
     notify(error.message || "Impossible d'importer ce fichier.");
   }
+}
+
+function safeFilename(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-|-$/g, "") || "utilisateur";
 }
 
 function download(filename, content, type) {

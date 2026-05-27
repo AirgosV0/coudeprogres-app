@@ -1,4 +1,4 @@
-const CACHE = "coudeprogres-v4";
+const CACHE = "coudeprogres-v5";
 const FILES = [
   "./",
   "./index.html",
@@ -7,7 +7,8 @@ const FILES = [
   "./assets/icon.svg",
   "./js/app.js",
   "./js/domain.js",
-  "./js/crypto-store.js"
+  "./js/crypto-store.js",
+  "./js/user-store.js"
 ];
 
 self.addEventListener("install", event => {
@@ -25,13 +26,14 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
+  if (!event.request.url.startsWith(self.location.origin)) return;
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-      if (response.ok && event.request.url.startsWith(self.location.origin)) {
+    fetch(event.request).then(response => {
+      if (response.ok) {
         const clone = response.clone();
         caches.open(CACHE).then(cache => cache.put(event.request, clone));
       }
       return response;
-    }))
+    }).catch(() => caches.match(event.request))
   );
 });
