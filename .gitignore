@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+
+# Never publish personal exports or encrypted backups from the application.
+coudeprogres-sauvegarde-*.json
+coudeprogres-liste-*.csv
+coudeprogres-rendez-vous-*.ics
+*.coudeprogres-backup.json

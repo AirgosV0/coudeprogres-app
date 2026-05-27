@@ -1,0 +1,18 @@
+{
+  "name": "CoudeProgres - Suivi de rééducation",
+  "short_name": "CoudeProgres",
+  "description": "Carnet privé de suivi de la rééducation du coude.",
+  "lang": "fr",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#faf8f3",
+  "theme_color": "#0a675d",
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

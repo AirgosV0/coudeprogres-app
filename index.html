@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0a675d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CoudeProgres">
+    <title>CoudeProgres</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="apple-touch-icon" href="./assets/icon.svg">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Suivi personnel</p>
+        <h1>CoudeProgres</h1>
+      </div>
+      <button id="lock-button" class="quiet hidden" type="button">Verrouiller</button>
+    </header>
+
+    <main>
+      <section id="welcome" class="welcome">
+        <div class="hero">
+          <p class="eyebrow">Votre rééducation, en privé</p>
+          <h2>Gardez trace de chaque étape.</h2>
+          <p>Rendez-vous, séances, exercices et progrès : tout reste chiffré sur cet appareil.</p>
+        </div>
+
+        <form id="create-vault-form" class="card hidden">
+          <h2>Créer mon espace privé</h2>
+          <label>Phrase secrète
+            <input name="passphrase" type="password" minlength="8" required autocomplete="new-password">
+          </label>
+          <label>Confirmer la phrase secrète
+            <input name="confirmation" type="password" minlength="8" required autocomplete="new-password">
+          </label>
+          <p class="note">Elle n'est jamais stockée. Si vous la perdez, vos notes ne pourront pas être récupérées.</p>
+          <button class="primary" type="submit">Créer et commencer</button>
+          <button id="show-import-first" class="text-button" type="button">Restaurer une sauvegarde</button>
+        </form>
+
+        <form id="unlock-form" class="card hidden">
+          <h2>Déverrouiller</h2>
+          <label>Phrase secrète
+            <input name="passphrase" type="password" required autocomplete="current-password">
+          </label>
+          <p id="unlock-error" class="error hidden">Phrase secrète incorrecte.</p>
+          <button class="primary" type="submit">Ouvrir CoudeProgres</button>
+          <button id="show-import-locked" class="text-button" type="button">Restaurer une sauvegarde</button>
+        </form>
+
+        <form id="restore-form" class="card hidden">
+          <h2>Restaurer une sauvegarde</h2>
+          <label>Fichier chiffré CoudeProgres
+            <input id="restore-file" type="file" accept=".json,application/json" required>
+          </label>
+          <button class="primary" type="submit">Importer</button>
+          <button id="cancel-restore" class="text-button" type="button">Annuler</button>
+        </form>
+      </section>
+
+      <section id="app" class="hidden">
+        <nav class="tabs" aria-label="Sections">
+          <button class="tab active" data-view="today" type="button">Aujourd'hui</button>
+          <button class="tab" data-view="add" type="button">Ajouter</button>
+          <button class="tab" data-view="calendar" type="button">Calendrier</button>
+          <button class="tab" data-view="records" type="button">Historique</button>
+          <button class="tab" data-view="settings" type="button">Données</button>
+        </nav>
+
+        <section id="view-today" class="view">
+          <article class="focus card">
+            <p class="eyebrow">Depuis 7 jours</p>
+            <h2 id="encouragement-title">Bienvenue</h2>
+            <p id="encouragement-message">Ajoutez une première étape de votre parcours.</p>
+          </article>
+          <div id="dashboard-cards" class="metrics"></div>
+          <article class="card">
+            <div class="section-title">
+              <h2>À venir</h2>
+              <button class="text-button goto-add" type="button">+ Ajouter</button>
+            </div>
+            <div id="upcoming-list" class="empty">Aucun rendez-vous à venir.</div>
+          </article>
+        </section>
+
+        <section id="view-add" class="view hidden">
+          <form id="entry-form" class="card form-card">
+            <input id="entry-id" type="hidden">
+            <div class="section-title">
+              <h2 id="entry-form-title">Nouvelle entrée</h2>
+              <button id="cancel-edit" class="text-button hidden" type="button">Annuler</button>
+            </div>
+            <label>Type
+              <select id="entry-type" required>
+                <option value="kine">Séance de kiné</option>
+                <option value="auto">Autorééducation</option>
+                <option value="medical">Rendez-vous médical</option>
+                <option value="progress">Progrès / ressenti</option>
+              </select>
+            </label>
+            <div class="row">
+              <label>Date
+                <input id="entry-date" type="date" required>
+              </label>
+              <label>Heure
+                <input id="entry-time" type="time">
+              </label>
+            </div>
+            <label>Titre
+              <input id="entry-title" type="text" maxlength="100" placeholder="Ex. Séance avec Julie, cabinet..." required>
+            </label>
+            <div class="row">
+              <label>Durée (min)
+                <input id="entry-duration" type="number" min="0" max="600" inputmode="numeric">
+              </label>
+              <label>Douleur (0-10)
+                <input id="entry-pain" type="number" min="0" max="10" inputmode="numeric">
+              </label>
+            </div>
+            <details>
+              <summary>Mesures de mobilité (facultatif)</summary>
+              <div class="row details-fields">
+                <label>Flexion (°)
+                  <input id="entry-flexion" type="number" min="0" max="180" inputmode="numeric">
+                </label>
+                <label>Extension (°)
+                  <input id="entry-extension" type="number" min="-90" max="180" inputmode="numeric">
+                </label>
+              </div>
+            </details>
+            <label>Ce que j'ai fait / observations
+              <textarea id="entry-details" rows="3" maxlength="1000"></textarea>
+            </label>
+            <label>Petit progrès ou réussite du jour
+              <textarea id="entry-achievement" rows="2" maxlength="500" placeholder="Même un détail compte."></textarea>
+            </label>
+            <label>Prochaine étape décidée avec mon soignant
+              <textarea id="entry-next" rows="2" maxlength="500"></textarea>
+            </label>
+            <button class="primary" type="submit">Enregistrer</button>
+          </form>
+        </section>
+
+        <section id="view-calendar" class="view hidden">
+          <article class="card">
+            <div class="month-nav">
+              <button id="month-back" class="quiet" type="button" aria-label="Mois précédent">&lsaquo;</button>
+              <input id="calendar-month" type="month">
+              <button id="month-forward" class="quiet" type="button" aria-label="Mois suivant">&rsaquo;</button>
+            </div>
+            <div class="weekdays" aria-hidden="true">
+              <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+          </article>
+          <article class="card">
+            <h2 id="month-summary">Entrées du mois</h2>
+            <div id="month-list"></div>
+          </article>
+        </section>
+
+        <section id="view-records" class="view hidden">
+          <article class="card">
+            <h2>Retrouver mes notes</h2>
+            <div class="filters">
+              <select id="filter-type" aria-label="Filtrer par sujet">
+                <option value="">Tous les sujets</option>
+                <option value="kine">Séances de kiné</option>
+                <option value="auto">Autorééducation</option>
+                <option value="medical">Rendez-vous médicaux</option>
+                <option value="progress">Progrès / ressentis</option>
+              </select>
+              <input id="filter-month" type="month" aria-label="Filtrer par mois">
+              <input id="filter-search" type="search" placeholder="Chercher un mot">
+            </div>
+            <p id="filter-summary" class="note"></p>
+          </article>
+          <div id="records-list"></div>
+        </section>
+
+        <section id="view-settings" class="view hidden">
+          <article class="card">
+            <h2>Confidentialité</h2>
+            <p>Vos données sont chiffrées dans ce navigateur. Aucune information n'est envoyée à un serveur par CoudeProgres.</p>
+            <p class="note">Pensez à conserver une sauvegarde chiffrée ; supprimer les données du navigateur efface votre carnet local.</p>
+          </article>
+          <article class="card actions">
+            <h2>Sauvegarde et restitution</h2>
+            <button id="export-backup" class="primary" type="button">Télécharger une sauvegarde chiffrée</button>
+            <button id="export-csv" class="quiet" type="button">Exporter la liste (.csv)</button>
+            <button id="export-calendar" class="quiet" type="button">Exporter au calendrier (.ics)</button>
+            <button id="restore-from-app" class="quiet" type="button">Restaurer une sauvegarde</button>
+            <p class="note">Les exports CSV et calendrier sont lisibles en clair. Protégez-les comme des documents médicaux.</p>
+          </article>
+          <article class="card caution">
+            <h2>Cadre d'utilisation</h2>
+            <p>Cette application vous aide à noter et relire votre parcours. Pour vos exercices, douleur ou évolution clinique, suivez les consignes de votre médecin ou kinésithérapeute.</p>
+          </article>
+        </section>
+      </section>
+    </main>
+    <div id="toast" class="toast hidden" role="status"></div>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
