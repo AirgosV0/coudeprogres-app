@@ -18,6 +18,8 @@ Elle distingue désormais deux moments :
 
 L'accueil rappelle les rendez-vous passés dont le bilan reste à compléter. Il présente aussi les progrès issus des bilans, sans confondre un rendez-vous simplement prévu avec une séance réellement effectuée. L'application comprend également un calendrier mensuel, un historique filtrable par sujet, statut et mois, une sauvegarde chiffrée téléchargeable même depuis l'écran verrouillé, un export CSV et un export calendrier.
 
+La V1 amorce le suivi du progrès avec quatre angles facultatifs dans les bilans : flexion, extension, pronation et supination. Une rubrique **Progrès** affiche ces mesures sous forme de cartes visuelles et de dernières valeurs saisies.
+
 Les exports CSV et calendrier ne sont pas chiffrés. La sauvegarde `.json`, elle, reste chiffrée.
 
 Cette V1 n'envoie pas les notes à une intelligence artificielle. Les messages d'encouragement sont calculés localement à partir des entrées. Une future fonction d'IA pourra rester optionnelle et préciser les données volontairement transmises.

@@ -6,6 +6,7 @@ import {
   filteredEntries,
   makePlannedEntry,
   makeReportEntry,
+  mobilityProgress,
   monthCells,
   normalizeJournal,
   reportsToComplete,
@@ -45,18 +46,20 @@ test("transforme un rendez-vous planifié en bilan renseigné", () => {
   const planned = makePlannedEntry({ type: "kine", date: "2026-05-27", time: "10:00", title: "Cabinet", planningNotes: "" }, "5");
   const completed = makeReportEntry({
     type: planned.type, date: planned.date, time: planned.time, title: planned.title,
-    duration: "30", pain: "3", flexion: "", extension: "", details: "Mobilité", achievement: "Mieux", nextStep: ""
+    duration: "30", pain: "3", flexion: "120", extension: "-10", pronation: "75", supination: "80", details: "Mobilité", achievement: "Mieux", nextStep: ""
   }, planned);
   assert.equal(completed.id, planned.id);
   assert.equal(completed.status, "completed");
   assert.equal(completed.pain, 3);
+  assert.equal(completed.pronation, 75);
+  assert.equal(completed.supination, 80);
 });
 
 test("utilise le type comme titre lorsqu'il est laissé vide", () => {
   const planned = makePlannedEntry({ type: "medical", date: "2026-06-01", time: "", title: "", planningNotes: "" });
   const report = makeReportEntry({
     type: "auto", date: "2026-05-27", time: "", title: "",
-    duration: "", pain: "", flexion: "", extension: "", details: "", achievement: "", nextStep: ""
+    duration: "", pain: "", flexion: "", extension: "", pronation: "", supination: "", details: "", achievement: "", nextStep: ""
   });
   assert.equal(planned.title, "Rendez-vous médical");
   assert.equal(report.title, "Autorééducation");
@@ -69,6 +72,22 @@ test("préserve les anciennes notes en leur attribuant un statut", () => {
   ] });
   assert.equal(migrated.entries[0].status, "planned");
   assert.equal(migrated.entries[1].status, "completed");
+  assert.equal(migrated.entries[0].pronation, "");
+  assert.equal(migrated.entries[1].supination, "");
+});
+
+test("prépare les séries de progression des angles", () => {
+  const progress = mobilityProgress([
+    { id: "a", status: "completed", type: "kine", date: "2026-05-01", title: "Début", flexion: 90, extension: -30 },
+    { id: "b", status: "completed", type: "kine", date: "2026-05-20", title: "Suite", flexion: 120, extension: -15, pronation: 70, supination: 60 }
+  ]);
+  const flexion = progress.find(metric => metric.key === "flexion");
+  const pronation = progress.find(metric => metric.key === "pronation");
+
+  assert.equal(flexion.latest.value, 120);
+  assert.equal(flexion.firstDelta, 30);
+  assert.equal(pronation.latest.value, 70);
+  assert.equal(pronation.firstDelta, 0);
 });
 
 test("le calendrier place les entrées à leur date", () => {
@@ -79,6 +98,8 @@ test("le calendrier place les entrées à leur date", () => {
 test("les exports incluent les données attendues", () => {
   assert.match(exportCsv(entries), /Kiné avril/);
   assert.match(exportCsv(entries), /Planifié/);
+  assert.match(exportCsv(entries), /Pronation \(degrés\)/);
+  assert.match(exportCsv(entries), /Supination \(degrés\)/);
   assert.match(exportIcs(entries), /Contrôle/);
   assert.doesNotMatch(exportIcs(entries), /Mobilité/);
 });

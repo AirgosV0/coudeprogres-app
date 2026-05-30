@@ -92,6 +92,7 @@
           <button class="tab" data-view="plan" type="button">Planifier</button>
           <button class="tab" data-view="calendar" type="button">Calendrier</button>
           <button class="tab" data-view="records" type="button">Historique</button>
+          <button class="tab" data-view="progress" type="button">Progrès</button>
           <button class="tab" data-view="settings" type="button">Données</button>
         </nav>
 
@@ -195,6 +196,12 @@
                 <label>Extension (°)
                   <input id="report-extension" type="number" min="-90" max="180" inputmode="numeric">
                 </label>
+                <label>Pronation (°)
+                  <input id="report-pronation" type="number" min="0" max="180" inputmode="numeric">
+                </label>
+                <label>Supination (°)
+                  <input id="report-supination" type="number" min="0" max="180" inputmode="numeric">
+                </label>
               </div>
             </details>
             <label>Ce qui a été marquant
@@ -250,6 +257,20 @@
             <p id="filter-summary" class="note"></p>
           </article>
           <div id="records-list"></div>
+        </section>
+
+        <section id="view-progress" class="view hidden">
+          <article class="focus card">
+            <p class="eyebrow">Mobilité</p>
+            <h2>Voir les angles évoluer</h2>
+            <p id="progress-summary">Ajoutez des angles dans vos bilans pour visualiser l'évolution.</p>
+          </article>
+          <div id="progress-overview" class="progress-grid"></div>
+          <article class="card">
+            <h2>Dernières mesures</h2>
+            <p class="note">Ces valeurs restent indicatives : suivez toujours les repères donnés par votre médecin ou kinésithérapeute.</p>
+            <div id="progress-history"></div>
+          </article>
         </section>
 
         <section id="view-settings" class="view hidden">

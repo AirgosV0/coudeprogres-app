@@ -195,12 +195,12 @@ export function monthCells(month, entries, today = isoToday()) {
 export function mobilityProgress(entries) {
   return MOBILITY_FIELDS.map(field => {
     const points = entries
-      .filter(entry => entry.status === "completed" && isMeasured(entry[field]))
+      .filter(entry => entry.status === "completed" && isMeasured(entry[field.key]))
       .map(entry => ({
         id: entry.id,
         date: entry.date,
         title: entry.title,
-        value: Number(entry[field])
+        value: Number(entry[field.key])
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
     const latest = points[points.length - 1] || null;

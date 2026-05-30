@@ -7,6 +7,7 @@ import {
   isoToday,
   makePlannedEntry,
   makeReportEntry,
+  mobilityProgress,
   monthCells,
   monthLabel,
   monthNow,
@@ -284,6 +285,8 @@ async function saveReport(event) {
     pain: $("report-pain").value,
     flexion: $("report-flexion").value,
     extension: $("report-extension").value,
+    pronation: $("report-pronation").value,
+    supination: $("report-supination").value,
     details: $("report-details").value,
     achievement: $("report-achievement").value,
     nextStep: $("report-next").value
@@ -339,6 +342,8 @@ function openReport(id = "") {
     $("report-pain").value = entry.pain ?? "";
     $("report-flexion").value = entry.flexion ?? "";
     $("report-extension").value = entry.extension ?? "";
+    $("report-pronation").value = entry.pronation ?? "";
+    $("report-supination").value = entry.supination ?? "";
     $("report-details").value = entry.details || "";
     $("report-achievement").value = entry.achievement || "";
     $("report-next").value = entry.nextStep || "";
@@ -374,12 +379,14 @@ function setView(name) {
   });
   if (name === "calendar") renderCalendar();
   if (name === "records") renderRecords();
+  if (name === "progress") renderProgress();
 }
 
 function renderAll() {
   renderDashboard();
   renderCalendar();
   renderRecords();
+  renderProgress();
 }
 
 function renderDashboard() {
@@ -441,6 +448,61 @@ function renderRecords() {
   $("records-list").innerHTML = entries.length ? entries.map(entryCard).join("") : `<article class="card">${emptyMessage()}</article>`;
 }
 
+function renderProgress() {
+  if (!journal) return;
+  const progress = mobilityProgress(journal.entries);
+  const measured = progress.filter(metric => metric.latest);
+  $("progress-summary").textContent = measured.length
+    ? `${measured.length} angle${measured.length > 1 ? "s" : ""} suivi${measured.length > 1 ? "s" : ""}.`
+    : "Ajoutez des angles dans vos bilans pour visualiser l'évolution.";
+  $("progress-overview").innerHTML = progress.map(progressCard).join("");
+
+  const points = progress
+    .flatMap(metric => metric.points.map(point => ({ ...point, label: metric.label, unit: metric.unit })))
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 8);
+  $("progress-history").innerHTML = points.length
+    ? points.map(point => `<div class="progress-row">
+        <span>${dateLabel(point.date)}</span>
+        <strong>${escapeHtml(point.label)}</strong>
+        <span>${point.value}${point.unit}</span>
+      </div>`).join("")
+    : '<div class="empty">Aucune mesure de mobilité pour le moment.</div>';
+}
+
+function progressCard(metric) {
+  if (!metric.latest) {
+    return `<article class="progress-card empty-progress">
+      <p class="eyebrow">${escapeHtml(metric.label)}</p>
+      <strong>-</strong>
+      <span>Aucune mesure</span>
+    </article>`;
+  }
+  const bars = metric.points.slice(-6).map(point => {
+    const height = progressHeight(point.value, metric.min, metric.max);
+    return `<span class="progress-bar" style="height:${height}%" title="${escapeHtml(dateLabel(point.date))} : ${point.value}${metric.unit}"></span>`;
+  }).join("");
+  const previous = metric.previousDelta === null ? "" : deltaText(metric.previousDelta, "depuis la mesure précédente");
+  const first = metric.firstDelta === null ? "" : deltaText(metric.firstDelta, "depuis le début");
+  return `<article class="progress-card">
+    <p class="eyebrow">${escapeHtml(metric.label)}</p>
+    <strong>${metric.latest.value}${metric.unit}</strong>
+    <span>${dateLabel(metric.latest.date)}</span>
+    <div class="progress-bars" aria-hidden="true">${bars}</div>
+    <p>${[previous, first].filter(Boolean).join(" · ") || "Première mesure"}</p>
+  </article>`;
+}
+
+function progressHeight(value, min, max) {
+  if (min === max) return 60;
+  return Math.round(22 + ((value - min) / (max - min)) * 68);
+}
+
+function deltaText(delta, label) {
+  if (delta === 0) return `stable ${label}`;
+  return `${delta > 0 ? "+" : ""}${delta}° ${label}`;
+}
+
 function entryCard(entry) {
   const observations = entry.details ? `<p>${escapeHtml(entry.details)}</p>` : "";
   const win = entry.achievement ? `<p><strong>Réussite :</strong> ${escapeHtml(entry.achievement)}</p>` : "";
@@ -448,7 +510,9 @@ function entryCard(entry) {
     entry.duration !== "" ? `${entry.duration} min` : "",
     entry.pain !== "" ? `douleur ${entry.pain}/10` : "",
     entry.flexion !== "" ? `flexion ${entry.flexion}°` : "",
-    entry.extension !== "" ? `extension ${entry.extension}°` : ""
+    entry.extension !== "" ? `extension ${entry.extension}°` : "",
+    entry.pronation !== "" ? `pronation ${entry.pronation}°` : "",
+    entry.supination !== "" ? `supination ${entry.supination}°` : ""
   ].filter(Boolean).join(" · ");
   const status = entry.status === "planned" ? '<span class="tag planned">Planifié</span>' : '<span class="tag completed">Bilan</span>';
   const action = entry.status === "planned"
