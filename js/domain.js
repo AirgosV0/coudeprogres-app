@@ -12,6 +12,13 @@ export const STATUSES = {
   completed: "Bilan renseigné"
 };
 
+export const MOBILITY_FIELDS = [
+  { key: "flexion", label: "Flexion", unit: "°" },
+  { key: "extension", label: "Extension", unit: "°" },
+  { key: "pronation", label: "Pronation", unit: "°" },
+  { key: "supination", label: "Supination", unit: "°" }
+];
+
 export function newJournal() {
   return { version: 1, entries: [], createdAt: new Date().toISOString() };
 }
@@ -30,11 +37,24 @@ export function normalizeJournal(value) {
 }
 
 function normalizeEntry(entry) {
-  if (entry.status === "planned" || entry.status === "completed") return entry;
+  const normalized = {
+    planningNotes: "",
+    duration: "",
+    pain: "",
+    flexion: "",
+    extension: "",
+    pronation: "",
+    supination: "",
+    details: "",
+    achievement: "",
+    nextStep: "",
+    ...entry
+  };
+  if (normalized.status === "planned" || normalized.status === "completed") return normalized;
   const hasReport = entry.type === "auto" || entry.type === "progress" ||
-    ["duration", "pain", "flexion", "extension", "details", "achievement", "nextStep"]
+    ["duration", "pain", "flexion", "extension", "pronation", "supination", "details", "achievement", "nextStep"]
       .some(key => entry[key] !== "" && entry[key] !== undefined && entry[key] !== null);
-  return { ...entry, status: hasReport ? "completed" : "planned" };
+  return { ...normalized, status: hasReport ? "completed" : "planned" };
 }
 
 export function makePlannedEntry(values, existingId = "") {
@@ -50,6 +70,8 @@ export function makePlannedEntry(values, existingId = "") {
     pain: "",
     flexion: "",
     extension: "",
+    pronation: "",
+    supination: "",
     details: "",
     achievement: "",
     nextStep: "",
@@ -71,6 +93,8 @@ export function makeReportEntry(values, existing = {}) {
     pain: numberOrEmpty(values.pain),
     flexion: numberOrEmpty(values.flexion),
     extension: numberOrEmpty(values.extension),
+    pronation: numberOrEmpty(values.pronation),
+    supination: numberOrEmpty(values.supination),
     details: values.details.trim(),
     achievement: values.achievement.trim(),
     nextStep: values.nextStep.trim(),
@@ -168,12 +192,42 @@ export function monthCells(month, entries, today = isoToday()) {
   });
 }
 
+export function mobilityProgress(entries) {
+  return MOBILITY_FIELDS.map(field => {
+    const points = entries
+      .filter(entry => entry.status === "completed" && isMeasured(entry[field]))
+      .map(entry => ({
+        id: entry.id,
+        date: entry.date,
+        title: entry.title,
+        value: Number(entry[field])
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const latest = points[points.length - 1] || null;
+    const first = points[0] || null;
+    const previous = points[points.length - 2] || null;
+    const values = points.map(point => point.value);
+    const min = values.length ? Math.min(...values) : 0;
+    const max = values.length ? Math.max(...values) : 0;
+    return {
+      ...field,
+      points,
+      latest,
+      firstDelta: latest && first ? latest.value - first.value : null,
+      previousDelta: latest && previous ? latest.value - previous.value : null,
+      min,
+      max
+    };
+  });
+}
+
 export function exportCsv(entries) {
   const columns = [
     ["date", "Date"], ["time", "Heure"], ["type", "Sujet"], ["status", "Statut"], ["title", "Titre"],
     ["planningNotes", "Notes de planification"],
     ["duration", "Durée (minutes)"], ["pain", "Douleur (0-10)"],
     ["flexion", "Flexion (degrés)"], ["extension", "Extension (degrés)"],
+    ["pronation", "Pronation (degrés)"], ["supination", "Supination (degrés)"],
     ["details", "Observations"], ["achievement", "Réussite"], ["nextStep", "Prochaine étape"]
   ];
   const lines = [columns.map(([, label]) => csvCell(label)).join(";")];
@@ -218,6 +272,10 @@ export function exportIcs(entries) {
 
 function isAppointment(entry) {
   return entry.type === "medical" || entry.type === "kine";
+}
+
+function isMeasured(value) {
+  return value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value));
 }
 
 function icsText(value) {
