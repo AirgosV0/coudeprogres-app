@@ -27,6 +27,17 @@ test("filtre les séances de kiné pour un mois demandé", () => {
   assert.equal(result[0].title, "Kiné avril");
 });
 
+test("trie l'historique par date d'événement puis par type", () => {
+  const result = filteredEntries([
+    { id: "auto", status: "completed", type: "auto", date: "2026-05-27", time: "", title: "Auto" },
+    { id: "medical", status: "completed", type: "medical", date: "2026-05-27", time: "", title: "Médical" },
+    { id: "kine", status: "completed", type: "kine", date: "2026-05-27", time: "", title: "Kiné" },
+    { id: "old", status: "completed", type: "medical", date: "2026-05-20", time: "", title: "Ancien" }
+  ]);
+
+  assert.deepEqual(result.map(entry => entry.id), ["medical", "kine", "auto", "old"]);
+});
+
 test("résume les sept derniers jours avec une réussite", () => {
   const result = sevenDaySummary(entries, "2026-05-27");
   assert.equal(result.recentCount, 1);

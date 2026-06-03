@@ -516,12 +516,12 @@ function entryCard(entry) {
   ].filter(Boolean).join(" · ");
   const status = entry.status === "planned" ? '<span class="tag planned">Planifié</span>' : '<span class="tag completed">Bilan</span>';
   const action = entry.status === "planned"
-    ? `<button class="text-button" data-action="report" data-id="${entry.id}" type="button">Faire le bilan</button>
+    ? `<button class="text-button soft-action" data-action="report" data-id="${entry.id}" type="button">Faire le bilan</button>
        <button class="text-button" data-action="plan-edit" data-id="${entry.id}" type="button">Modifier</button>`
     : `<button class="text-button" data-action="report" data-id="${entry.id}" type="button">Modifier le bilan</button>`;
-  return `<article class="entry">
+  return `<article class="entry type-${entry.type}">
     <h3>${escapeHtml(entry.title)}</h3>
-    <p class="entry-meta"><span class="tag">${TYPES[entry.type]}</span>${status}${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
+    <p class="entry-meta"><span class="tag type-tag type-${entry.type}">${TYPES[entry.type]}</span>${status}${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
     ${measures ? `<p class="entry-meta">${measures}</p>` : ""}
     ${observations}${win}
     <div class="entry-actions">
@@ -534,11 +534,11 @@ function entryCard(entry) {
 function planningCard(entry) {
   const notes = entry.planningNotes ? `<p>${escapeHtml(entry.planningNotes)}</p>` : "";
   const canReport = entry.date <= isoToday()
-    ? `<button class="primary small" data-action="report" data-id="${entry.id}" type="button">Faire le bilan</button>`
+    ? `<button class="quiet small soft-action" data-action="report" data-id="${entry.id}" type="button">Faire le bilan</button>`
     : "";
-  return `<article class="entry">
+  return `<article class="entry type-${entry.type}">
     <h3>${escapeHtml(entry.title)}</h3>
-    <p class="entry-meta"><span class="tag">${TYPES[entry.type]}</span>${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
+    <p class="entry-meta"><span class="tag type-tag type-${entry.type}">${TYPES[entry.type]}</span>${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
     ${notes}
     <div class="entry-actions">
       ${canReport}

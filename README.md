@@ -20,6 +20,8 @@ L'accueil rappelle les rendez-vous passés dont le bilan reste à compléter. Il
 
 La V1 amorce le suivi du progrès avec quatre angles facultatifs dans les bilans : flexion, extension, pronation et supination. Une rubrique **Progrès** affiche ces mesures sous forme de cartes visuelles et de dernières valeurs saisies.
 
+La V1.1 améliore l'ergonomie de l'accueil et de l'historique : les bilans à compléter sont séparés de la saisie spontanée **Séance libre**, les cartes reprennent les couleurs par type, le bouton **Faire le bilan** est adouci, et l'historique est trié par date d'événement puis par type.
+
 Les exports CSV et calendrier ne sont pas chiffrés. La sauvegarde `.json`, elle, reste chiffrée.
 
 Cette V1 n'envoie pas les notes à une intelligence artificielle. Les messages d'encouragement sont calculés localement à partir des entrées. Une future fonction d'IA pourra rester optionnelle et préciser les données volontairement transmises.

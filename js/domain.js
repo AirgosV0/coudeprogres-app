@@ -7,6 +7,13 @@ export const TYPES = {
   progress: "Progrès / ressenti"
 };
 
+const TYPE_ORDER = {
+  medical: 1,
+  kine: 2,
+  auto: 3,
+  progress: 4
+};
+
 export const STATUSES = {
   planned: "Planifié",
   completed: "Bilan renseigné"
@@ -123,7 +130,7 @@ export function filteredEntries(entries, { type = "", status = "", month = "", s
         .toLocaleLowerCase("fr")
         .includes(needle);
     })
-    .sort(compareRecentFirst);
+    .sort(compareEntriesByEvent);
 }
 
 export function upcomingEntries(entries, today = isoToday()) {
@@ -136,7 +143,7 @@ export function upcomingEntries(entries, today = isoToday()) {
 export function reportsToComplete(entries, today = isoToday()) {
   return entries
     .filter(entry => entry.status === "planned" && isAppointment(entry) && entry.date < today)
-    .sort(compareRecentFirst);
+    .sort(compareEntriesByEvent);
 }
 
 export function sevenDaySummary(entries, today = isoToday()) {
@@ -149,7 +156,7 @@ export function sevenDaySummary(entries, today = isoToday()) {
   const previous = reports.filter(entry => inPeriod(entry.date, previousStart, previousEnd));
   const practices = recent.filter(entry => entry.type === "kine" || entry.type === "auto").length;
   const latestWin = [...recent]
-    .sort(compareRecentFirst)
+    .sort(compareEntriesByEvent)
     .find(entry => entry.achievement)?.achievement;
 
   let title = "Notez votre première étape";
@@ -304,8 +311,10 @@ export function shiftMonth(month, amount) {
   return localIso(date).slice(0, 7);
 }
 
-function compareRecentFirst(a, b) {
-  return `${b.date}T${b.time || ""}`.localeCompare(`${a.date}T${a.time || ""}`);
+function compareEntriesByEvent(a, b) {
+  const dateComparison = `${b.date}T${b.time || ""}`.localeCompare(`${a.date}T${a.time || ""}`);
+  if (dateComparison) return dateComparison;
+  return (TYPE_ORDER[a.type] || 99) - (TYPE_ORDER[b.type] || 99);
 }
 
 function inPeriod(iso, start, end) {

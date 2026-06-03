@@ -375,7 +375,10 @@ summary {
 
 .entry {
   border-bottom: 1px solid var(--border);
+  border-left: 4px solid transparent;
+  margin-left: -0.25rem;
   padding: 0.72rem 0;
+  padding-left: 0.75rem;
 }
 
 .entry:last-child {
@@ -414,6 +417,42 @@ summary {
   color: #21586b;
 }
 
+.type-kine {
+  border-left-color: var(--teal);
+}
+
+.type-medical {
+  border-left-color: var(--sun);
+}
+
+.type-auto {
+  border-left-color: #4296a6;
+}
+
+.type-progress {
+  border-left-color: #b36f94;
+}
+
+.type-tag.type-kine {
+  background: var(--mint);
+  color: var(--teal-deep);
+}
+
+.type-tag.type-medical {
+  background: #f8eed6;
+  color: #725727;
+}
+
+.type-tag.type-auto {
+  background: #e3f2f5;
+  color: #225f69;
+}
+
+.type-tag.type-progress {
+  background: #f4e7ee;
+  color: #7a3c5c;
+}
+
 .entry p {
   font-size: 0.9rem;
   margin: 0.35rem 0;
@@ -433,6 +472,16 @@ summary {
 .entry-actions .primary.small {
   padding: 0.45rem 0.65rem;
   width: auto;
+}
+
+.entry-actions .quiet.small {
+  padding: 0.45rem 0.65rem;
+}
+
+.soft-action {
+  background: var(--mint);
+  border-color: transparent;
+  color: var(--teal-deep);
 }
 
 .delete {
@@ -531,6 +580,15 @@ summary {
 .actions button {
   margin-bottom: 0.65rem;
   width: 100%;
+}
+
+.free-entry-card {
+  background: linear-gradient(135deg, var(--paper) 0%, var(--mint) 100%);
+}
+
+.free-entry-card p:not(.eyebrow) {
+  color: var(--muted);
+  margin-top: 0;
 }
 
 .caution {
