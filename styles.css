@@ -1,15 +1,17 @@
 :root {
-  --ink: #172d2b;
-  --muted: #617571;
-  --teal: #0a675d;
-  --teal-deep: #064c45;
-  --mint: #e5f3ee;
-  --cream: #faf8f3;
+  --ink: #2f241d;
+  --muted: #74675d;
+  --teal: #9a5f35;
+  --teal-deep: #5f3b25;
+  --mint: #f3e8dc;
+  --cream: #faf6ee;
   --paper: #ffffff;
-  --sun: #f1c871;
-  --border: #dae4de;
+  --sun: #d8a13c;
+  --auto: #637f95;
+  --progress: #b56f66;
+  --border: #e2d5c8;
   --danger: #9f302d;
-  --shadow: 0 8px 25px rgba(13, 45, 40, 0.06);
+  --shadow: 0 8px 25px rgba(74, 47, 28, 0.06);
   font-family: Inter, "Avenir Next", "Segoe UI", system-ui, sans-serif;
   color: var(--ink);
   background: var(--cream);
@@ -132,7 +134,7 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(10, 103, 93, 0.15);
+  box-shadow: 0 0 0 3px rgba(154, 95, 53, 0.15);
   outline: none;
 }
 
@@ -366,11 +368,11 @@ summary {
 }
 
 .dot.auto {
-  background: #4296a6;
+  background: var(--auto);
 }
 
 .dot.progress {
-  background: #b36f94;
+  background: var(--progress);
 }
 
 .entry {
@@ -426,15 +428,15 @@ summary {
 }
 
 .type-auto {
-  border-left-color: #4296a6;
+  border-left-color: var(--auto);
 }
 
 .type-progress {
-  border-left-color: #b36f94;
+  border-left-color: var(--progress);
 }
 
 .type-tag.type-kine {
-  background: var(--mint);
+  background: #f5e8d9;
   color: var(--teal-deep);
 }
 
@@ -444,8 +446,8 @@ summary {
 }
 
 .type-tag.type-auto {
-  background: #e3f2f5;
-  color: #225f69;
+  background: #e6eef3;
+  color: #3d5d72;
 }
 
 .type-tag.type-progress {
