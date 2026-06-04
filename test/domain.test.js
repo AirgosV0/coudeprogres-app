@@ -4,6 +4,7 @@ import {
   exportCsv,
   exportIcs,
   filteredEntries,
+  hasAutomaticTitle,
   makePlannedEntry,
   makeReportEntry,
   mobilityProgress,
@@ -74,6 +75,8 @@ test("utilise le type comme titre lorsqu'il est laissé vide", () => {
   });
   assert.equal(planned.title, "Rendez-vous médical");
   assert.equal(report.title, "Autorééducation");
+  assert.equal(hasAutomaticTitle(planned), true);
+  assert.equal(hasAutomaticTitle({ ...report, title: "Ressenti du soir" }), false);
 });
 
 test("préserve les anciennes notes en leur attribuant un statut", () => {

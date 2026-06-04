@@ -224,6 +224,13 @@
             <div id="upcoming-list" class="empty">Aucun rendez-vous à venir.</div>
           </article>
           <article class="card">
+            <h2>Filtrer le calendrier</h2>
+            <div class="calendar-filters" aria-label="Filtrer les types affichés dans le calendrier">
+              <button class="calendar-filter active type-kine" data-calendar-type="kine" type="button">Kiné</button>
+              <button class="calendar-filter active type-medical" data-calendar-type="medical" type="button">Médical</button>
+              <button class="calendar-filter active type-auto" data-calendar-type="auto" type="button">Auto</button>
+              <button class="calendar-filter active type-progress" data-calendar-type="progress" type="button">Progrès</button>
+            </div>
             <div class="month-nav">
               <button id="month-back" class="quiet" type="button" aria-label="Mois précédent">&lsaquo;</button>
               <input id="calendar-month" type="month">
@@ -233,6 +240,10 @@
               <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
             </div>
             <div id="calendar-grid" class="calendar-grid"></div>
+          </article>
+          <article class="card">
+            <h2 id="calendar-day-title">Détail du jour</h2>
+            <div id="calendar-day-list"></div>
           </article>
           <article class="card">
             <h2 id="month-summary">Entrées du mois</h2>

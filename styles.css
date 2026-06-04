@@ -336,10 +336,12 @@ summary {
   border: 1px solid transparent;
   border-radius: 9px;
   color: var(--ink);
+  cursor: pointer;
   font-size: 0.85rem;
   height: 3.25rem;
   padding: 0.35rem;
   text-align: left;
+  width: 100%;
 }
 
 .day.outside {
@@ -347,6 +349,11 @@ summary {
 }
 
 .day.today {
+  border-color: var(--teal);
+}
+
+.day.selected {
+  background: var(--mint);
   border-color: var(--teal);
 }
 
@@ -373,6 +380,28 @@ summary {
 
 .dot.progress {
   background: var(--progress);
+}
+
+.calendar-filters {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 1rem;
+}
+
+.calendar-filter {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-left: 4px solid currentColor;
+  border-radius: 11px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  padding: 0.55rem 0.35rem;
+}
+
+.calendar-filter.active {
+  background: var(--mint);
+  color: var(--teal-deep);
 }
 
 .entry {

@@ -109,6 +109,10 @@ export function makeReportEntry(values, existing = {}) {
   };
 }
 
+export function hasAutomaticTitle(entry) {
+  return entry.title === TYPES[entry.type];
+}
+
 function numberOrEmpty(value) {
   return value === "" || value === null || value === undefined ? "" : Number(value);
 }

@@ -4,6 +4,7 @@ import {
   exportCsv,
   exportIcs,
   filteredEntries,
+  hasAutomaticTitle,
   isoToday,
   makePlannedEntry,
   makeReportEntry,
@@ -43,6 +44,8 @@ let activeKey = null;
 let journal = null;
 let toastTimer = null;
 let hiddenAt = null;
+let selectedCalendarDate = isoToday();
+let calendarTypes = new Set(Object.keys(TYPES));
 
 boot();
 
@@ -81,6 +84,9 @@ function bindEvents() {
   $("month-back").addEventListener("click", () => moveMonth(-1));
   $("month-forward").addEventListener("click", () => moveMonth(1));
   $("calendar-month").addEventListener("change", renderCalendar);
+  document.querySelectorAll("[data-calendar-type]").forEach(button => {
+    button.addEventListener("click", () => toggleCalendarType(button));
+  });
   $("filter-type").addEventListener("change", renderRecords);
   $("filter-status").addEventListener("change", renderRecords);
   $("filter-month").addEventListener("change", renderRecords);
@@ -102,6 +108,8 @@ function bindEvents() {
   $("new-free-report").addEventListener("click", () => openReport());
   $("records-list").addEventListener("click", handleEntryAction);
   $("month-list").addEventListener("click", handleEntryAction);
+  $("calendar-day-list").addEventListener("click", handleEntryAction);
+  $("calendar-grid").addEventListener("click", selectCalendarDay);
   $("upcoming-list").addEventListener("click", handleEntryAction);
   $("pending-list").addEventListener("click", handleEntryAction);
   document.addEventListener("visibilitychange", () => {
@@ -415,22 +423,49 @@ function metric(value, label) {
 function renderCalendar() {
   if (!journal) return;
   const month = $("calendar-month").value || monthNow();
+  if (!selectedCalendarDate.startsWith(month)) selectedCalendarDate = `${month}-01`;
+  const calendarEntries = journal.entries.filter(entry => calendarTypes.has(entry.type));
   $("calendar-grid").innerHTML = monthCells(month, journal.entries).map(cell => {
-    const dots = cell.entries.slice(0, 4)
+    const entries = cell.entries.filter(entry => calendarTypes.has(entry.type));
+    const dots = entries.slice(0, 4)
       .map(entry => `<span class="dot ${entry.type}"></span>`)
       .join("");
-    return `<div class="day ${cell.currentMonth ? "" : "outside"} ${cell.today ? "today" : ""}">
+    return `<button class="day ${cell.currentMonth ? "" : "outside"} ${cell.today ? "today" : ""} ${cell.iso === selectedCalendarDate ? "selected" : ""}" data-date="${cell.iso}" type="button">
       ${cell.day}<div class="dots">${dots}</div>
-    </div>`;
+    </button>`;
   }).join("");
-  const entries = filteredEntries(journal.entries, { month });
+  const entries = filteredEntries(calendarEntries, { month });
   $("month-summary").textContent = `${entries.length} entrée${entries.length > 1 ? "s" : ""} - ${monthLabel(month)}`;
   $("month-list").innerHTML = entries.length ? entries.map(entryCard).join("") : emptyMessage();
+  renderCalendarDay(calendarEntries);
 }
 
 function moveMonth(amount) {
   $("calendar-month").value = shiftMonth($("calendar-month").value || monthNow(), amount);
   renderCalendar();
+}
+
+function toggleCalendarType(button) {
+  const type = button.dataset.calendarType;
+  if (calendarTypes.has(type) && calendarTypes.size > 1) calendarTypes.delete(type);
+  else calendarTypes.add(type);
+  button.classList.toggle("active", calendarTypes.has(type));
+  renderCalendar();
+}
+
+function selectCalendarDay(event) {
+  const button = event.target.closest("button[data-date]");
+  if (!button) return;
+  selectedCalendarDate = button.dataset.date;
+  renderCalendar();
+}
+
+function renderCalendarDay(entries) {
+  const dayEntries = filteredEntries(entries).filter(entry => entry.date === selectedCalendarDate);
+  $("calendar-day-title").textContent = `Le ${dateLabel(selectedCalendarDate)}`;
+  $("calendar-day-list").innerHTML = dayEntries.length
+    ? dayEntries.map(entryCard).join("")
+    : '<div class="empty">Aucune entrée ce jour-là pour les filtres choisis.</div>';
 }
 
 function renderRecords() {
@@ -515,13 +550,14 @@ function entryCard(entry) {
     entry.supination !== "" ? `supination ${entry.supination}°` : ""
   ].filter(Boolean).join(" · ");
   const status = entry.status === "planned" ? '<span class="tag planned">Planifié</span>' : '<span class="tag completed">Bilan</span>';
+  const typeTag = hasAutomaticTitle(entry) ? "" : `<span class="tag type-tag type-${entry.type}">${TYPES[entry.type]}</span>`;
   const action = entry.status === "planned"
     ? `<button class="text-button soft-action" data-action="report" data-id="${entry.id}" type="button">Faire le bilan</button>
        <button class="text-button" data-action="plan-edit" data-id="${entry.id}" type="button">Modifier</button>`
     : `<button class="text-button" data-action="report" data-id="${entry.id}" type="button">Modifier le bilan</button>`;
   return `<article class="entry type-${entry.type}">
     <h3>${escapeHtml(entry.title)}</h3>
-    <p class="entry-meta"><span class="tag type-tag type-${entry.type}">${TYPES[entry.type]}</span>${status}${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
+    <p class="entry-meta">${typeTag}${status}${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
     ${measures ? `<p class="entry-meta">${measures}</p>` : ""}
     ${observations}${win}
     <div class="entry-actions">
@@ -533,12 +569,13 @@ function entryCard(entry) {
 
 function planningCard(entry) {
   const notes = entry.planningNotes ? `<p>${escapeHtml(entry.planningNotes)}</p>` : "";
+  const typeTag = hasAutomaticTitle(entry) ? "" : `<span class="tag type-tag type-${entry.type}">${TYPES[entry.type]}</span>`;
   const canReport = entry.date <= isoToday()
     ? `<button class="quiet small soft-action" data-action="report" data-id="${entry.id}" type="button">Faire le bilan</button>`
     : "";
   return `<article class="entry type-${entry.type}">
     <h3>${escapeHtml(entry.title)}</h3>
-    <p class="entry-meta"><span class="tag type-tag type-${entry.type}">${TYPES[entry.type]}</span>${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
+    <p class="entry-meta">${typeTag}${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
     ${notes}
     <div class="entry-actions">
       ${canReport}
