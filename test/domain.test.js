@@ -7,6 +7,7 @@ import {
   hasAutomaticTitle,
   makePlannedEntry,
   makeReportEntry,
+  MOBILITY_FIELDS,
   mobilityProgress,
   monthCells,
   normalizeJournal,
@@ -102,6 +103,19 @@ test("prépare les séries de progression des angles", () => {
   assert.equal(flexion.firstDelta, 30);
   assert.equal(pronation.latest.value, 70);
   assert.equal(pronation.firstDelta, 0);
+});
+
+test("documente les repères habituels de mobilité", () => {
+  const extension = MOBILITY_FIELDS.find(field => field.key === "extension");
+  const flexion = MOBILITY_FIELDS.find(field => field.key === "flexion");
+  const supination = MOBILITY_FIELDS.find(field => field.key === "supination");
+
+  assert.equal(extension.scaleMin, -90);
+  assert.equal(extension.normalMin, 0);
+  assert.equal(extension.normalMax, 10);
+  assert.equal(flexion.normalMin, 140);
+  assert.equal(flexion.normalMax, 150);
+  assert.equal(supination.normalMax, 90);
 });
 
 test("le calendrier place les entrées à leur date", () => {

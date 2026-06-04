@@ -568,6 +568,40 @@ summary {
   margin-bottom: 0;
 }
 
+.angle-gauge {
+  background: #f3ece3;
+  border-radius: 999px;
+  height: 0.85rem;
+  margin: 0.85rem 0 0.35rem;
+  overflow: visible;
+  position: relative;
+}
+
+.angle-gauge-normal {
+  background: rgba(215, 143, 85, 0.5);
+  border-radius: 999px;
+  bottom: 0;
+  position: absolute;
+  top: 0;
+}
+
+.angle-gauge-value {
+  background: var(--teal-deep);
+  border: 2px solid var(--paper);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(39, 92, 88, 0.22);
+  height: 1.35rem;
+  position: absolute;
+  top: -0.25rem;
+  transform: translateX(-50%);
+  width: 0.55rem;
+}
+
+.progress-card .angle-gauge-label {
+  color: var(--muted);
+  margin: 0 0 0.7rem;
+}
+
 .empty-progress {
   background: #f7faf8;
 }

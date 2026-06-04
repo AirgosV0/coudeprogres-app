@@ -20,10 +20,46 @@ export const STATUSES = {
 };
 
 export const MOBILITY_FIELDS = [
-  { key: "flexion", label: "Flexion", unit: "°" },
-  { key: "extension", label: "Extension", unit: "°" },
-  { key: "pronation", label: "Pronation", unit: "°" },
-  { key: "supination", label: "Supination", unit: "°" }
+  {
+    key: "flexion",
+    label: "Flexion",
+    unit: "°",
+    normalMin: 140,
+    normalMax: 150,
+    scaleMin: 0,
+    scaleMax: 150,
+    hint: "Main rapprochée de l'épaule."
+  },
+  {
+    key: "extension",
+    label: "Extension",
+    unit: "°",
+    normalMin: 0,
+    normalMax: 10,
+    scaleMin: -90,
+    scaleMax: 10,
+    hint: "Bras tendu ; l'hyperextension peut aller un peu au-delà de 0°."
+  },
+  {
+    key: "pronation",
+    label: "Pronation",
+    unit: "°",
+    normalMin: 75,
+    normalMax: 85,
+    scaleMin: 0,
+    scaleMax: 90,
+    hint: "Coude plié à 90°, paume tournée vers le sol."
+  },
+  {
+    key: "supination",
+    label: "Supination",
+    unit: "°",
+    normalMin: 80,
+    normalMax: 90,
+    scaleMin: 0,
+    scaleMax: 90,
+    hint: "Coude plié à 90°, paume tournée vers le plafond."
+  }
 ];
 
 export function newJournal() {

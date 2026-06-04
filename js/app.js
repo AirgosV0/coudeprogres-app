@@ -517,15 +517,34 @@ function progressCard(metric) {
     const height = progressHeight(point.value, metric.min, metric.max);
     return `<span class="progress-bar" style="height:${height}%" title="${escapeHtml(dateLabel(point.date))} : ${point.value}${metric.unit}"></span>`;
   }).join("");
+  const normalLeft = gaugePosition(metric.normalMin, metric.scaleMin, metric.scaleMax);
+  const normalRight = gaugePosition(metric.normalMax, metric.scaleMin, metric.scaleMax);
+  const valueLeft = gaugePosition(metric.latest.value, metric.scaleMin, metric.scaleMax);
   const previous = metric.previousDelta === null ? "" : deltaText(metric.previousDelta, "depuis la mesure précédente");
   const first = metric.firstDelta === null ? "" : deltaText(metric.firstDelta, "depuis le début");
   return `<article class="progress-card">
     <p class="eyebrow">${escapeHtml(metric.label)}</p>
     <strong>${metric.latest.value}${metric.unit}</strong>
     <span>${dateLabel(metric.latest.date)}</span>
+    <div class="angle-gauge" aria-label="${escapeHtml(metric.label)} : ${metric.latest.value}${metric.unit}, repère habituel ${formatNormalRange(metric)}">
+      <span class="angle-gauge-normal" style="left:${normalLeft}%;width:${normalRight - normalLeft}%"></span>
+      <span class="angle-gauge-value" style="left:${valueLeft}%"></span>
+    </div>
+    <p class="angle-gauge-label">Repère habituel : ${formatNormalRange(metric)}</p>
     <div class="progress-bars" aria-hidden="true">${bars}</div>
     <p>${[previous, first].filter(Boolean).join(" · ") || "Première mesure"}</p>
   </article>`;
+}
+
+function gaugePosition(value, min, max) {
+  if (min === max) return 0;
+  const position = ((value - min) / (max - min)) * 100;
+  return Math.max(0, Math.min(100, Math.round(position)));
+}
+
+function formatNormalRange(metric) {
+  if (metric.key === "extension") return "0 à 10° (extension complète puis hyperextension possible)";
+  return `${metric.normalMin} à ${metric.normalMax}${metric.unit}`;
 }
 
 function progressHeight(value, min, max) {
