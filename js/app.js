@@ -269,7 +269,7 @@ async function savePlanning(event) {
   else journal.entries.push(entry);
   await persist();
   resetPlanningForm();
-  setView("today");
+  setView("plan");
   notify(existingIndex >= 0 ? "Rendez-vous modifié." : "Rendez-vous planifié.");
 }
 
