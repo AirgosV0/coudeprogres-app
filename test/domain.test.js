@@ -93,14 +93,17 @@ test("préserve les anciennes notes en leur attribuant un statut", () => {
 
 test("prépare les séries de progression des angles", () => {
   const progress = mobilityProgress([
-    { id: "a", status: "completed", type: "kine", date: "2026-05-01", title: "Début", flexion: 90, extension: -30 },
-    { id: "b", status: "completed", type: "kine", date: "2026-05-20", title: "Suite", flexion: 120, extension: -15, pronation: 70, supination: 60 }
+    { id: "a", status: "completed", type: "kine", date: "2026-05-01", title: "Début", flexion: 90, extension: 30 },
+    { id: "b", status: "completed", type: "kine", date: "2026-05-20", title: "Suite", flexion: 120, extension: 15, pronation: 70, supination: 60 }
   ]);
   const flexion = progress.find(metric => metric.key === "flexion");
+  const extension = progress.find(metric => metric.key === "extension");
   const pronation = progress.find(metric => metric.key === "pronation");
 
   assert.equal(flexion.latest.value, 120);
   assert.equal(flexion.firstDelta, 30);
+  assert.equal(extension.latest.value, -15);
+  assert.equal(extension.firstDelta, 15);
   assert.equal(pronation.latest.value, 70);
   assert.equal(pronation.firstDelta, 0);
 });
@@ -113,6 +116,8 @@ test("documente les repères habituels de mobilité", () => {
   assert.equal(extension.scaleMin, -90);
   assert.equal(extension.normalMin, 0);
   assert.equal(extension.normalMax, 10);
+  assert.equal(extension.displayValue(25), -25);
+  assert.equal(extension.displayValue(-5), -5);
   assert.equal(flexion.normalMin, 140);
   assert.equal(flexion.normalMax, 150);
   assert.equal(supination.normalMax, 90);

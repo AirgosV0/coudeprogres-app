@@ -38,6 +38,7 @@ export const MOBILITY_FIELDS = [
     normalMax: 10,
     scaleMin: -90,
     scaleMax: 10,
+    displayValue: value => value > 0 ? -value : value,
     hint: "Bras tendu ; l'hyperextension peut aller un peu au-delà de 0°."
   },
   {
@@ -247,7 +248,7 @@ export function mobilityProgress(entries) {
         id: entry.id,
         date: entry.date,
         title: entry.title,
-        value: Number(entry[field.key])
+        value: displayMobilityValue(field, Number(entry[field.key]))
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
     const latest = points[points.length - 1] || null;
@@ -266,6 +267,10 @@ export function mobilityProgress(entries) {
       max
     };
   });
+}
+
+function displayMobilityValue(field, value) {
+  return field.displayValue ? field.displayValue(value) : value;
 }
 
 export function exportCsv(entries) {
