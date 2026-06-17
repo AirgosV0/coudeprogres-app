@@ -2,7 +2,7 @@ import { createId } from "./platform.js";
 
 export const TYPES = {
   kine: "Séance de kiné",
-  auto: "Autorééducation",
+  auto: "Autorééducation / Impression du jour",
   medical: "Rendez-vous médical",
   progress: "Progrès / ressenti"
 };
@@ -123,6 +123,18 @@ export function makePlannedEntry(values, existingId = "") {
   };
 }
 
+export function hasDuplicatePlannedEntry(entries, candidate) {
+  return entries.some(entry =>
+    entry.id !== candidate.id &&
+    entry.status === "planned" &&
+    entry.type === candidate.type &&
+    entry.date === candidate.date &&
+    (entry.time || "") === (candidate.time || "") &&
+    comparableText(entry.title) === comparableText(candidate.title) &&
+    comparableText(entry.planningNotes) === comparableText(candidate.planningNotes)
+  );
+}
+
 export function makeReportEntry(values, existing = {}) {
   return {
     ...existing,
@@ -147,7 +159,7 @@ export function makeReportEntry(values, existing = {}) {
 }
 
 export function hasAutomaticTitle(entry) {
-  return entry.title === TYPES[entry.type];
+  return entry.title === TYPES[entry.type] || (entry.type === "auto" && entry.title === "Autorééducation");
 }
 
 function numberOrEmpty(value) {
@@ -156,6 +168,10 @@ function numberOrEmpty(value) {
 
 function entryTitle(values) {
   return values.title.trim() || TYPES[values.type];
+}
+
+function comparableText(value) {
+  return (value || "").trim().replace(/\s+/g, " ").toLocaleLowerCase("fr");
 }
 
 export function filteredEntries(entries, { type = "", status = "", month = "", search = "" } = {}) {
@@ -175,16 +191,37 @@ export function filteredEntries(entries, { type = "", status = "", month = "", s
 }
 
 export function upcomingEntries(entries, today = isoToday()) {
-  return entries
-    .filter(entry => entry.status === "planned" && isAppointment(entry) && entry.date >= today)
-    .sort((a, b) => `${a.date}T${a.time || "23:59"}`.localeCompare(`${b.date}T${b.time || "23:59"}`))
-    .slice(0, 5);
+  return futureAppointments(entries, today).slice(0, 5);
+}
+
+export function nextAppointmentsByType(entries, today = isoToday()) {
+  const upcoming = futureAppointments(entries, today);
+  return ["medical", "kine"]
+    .map(type => upcoming.find(entry => entry.type === type))
+    .filter(Boolean);
 }
 
 export function reportsToComplete(entries, today = isoToday()) {
   return entries
     .filter(entry => entry.status === "planned" && isAppointment(entry) && entry.date < today)
     .sort(compareEntriesByEvent);
+}
+
+export function lifetimeSummary(entries) {
+  const completed = filteredEntries(entries, { status: "completed" }).reverse();
+  const reports = completed.length;
+  const practices = completed.filter(entry => entry.type === "kine" || entry.type === "auto").length;
+  const appointments = completed.filter(entry => entry.type === "medical").length;
+  return {
+    reports,
+    practices,
+    appointments,
+    series: [
+      cumulativeSeries(completed, "Bilans", () => true),
+      cumulativeSeries(completed, "Séances", entry => entry.type === "kine" || entry.type === "auto"),
+      cumulativeSeries(completed, "RDV médicaux", entry => entry.type === "medical")
+    ]
+  };
 }
 
 export function sevenDaySummary(entries, today = isoToday()) {
@@ -222,6 +259,15 @@ export function sevenDaySummary(entries, today = isoToday()) {
     practices,
     appointments: recent.filter(entry => entry.type === "medical").length
   };
+}
+
+function cumulativeSeries(entries, label, predicate) {
+  let count = 0;
+  const points = entries.map(entry => {
+    if (predicate(entry)) count += 1;
+    return { date: entry.date, value: count };
+  });
+  return { label, total: count, points };
 }
 
 export function monthCells(month, entries, today = isoToday()) {
@@ -324,6 +370,12 @@ export function exportIcs(entries) {
 
 function isAppointment(entry) {
   return entry.type === "medical" || entry.type === "kine";
+}
+
+function futureAppointments(entries, today) {
+  return entries
+    .filter(entry => entry.status === "planned" && isAppointment(entry) && entry.date >= today)
+    .sort((a, b) => `${a.date}T${a.time || "23:59"}`.localeCompare(`${b.date}T${b.time || "23:59"}`));
 }
 
 function isMeasured(value) {

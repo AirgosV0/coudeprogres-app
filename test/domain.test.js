@@ -5,11 +5,14 @@ import {
   exportIcs,
   filteredEntries,
   hasAutomaticTitle,
+  hasDuplicatePlannedEntry,
+  lifetimeSummary,
   makePlannedEntry,
   makeReportEntry,
   MOBILITY_FIELDS,
   mobilityProgress,
   monthCells,
+  nextAppointmentsByType,
   normalizeJournal,
   reportsToComplete,
   sevenDaySummary,
@@ -51,6 +54,22 @@ test("liste seulement les rendez-vous futurs utiles au tableau de bord", () => {
   assert.deepEqual(upcomingEntries(entries, "2026-05-27").map(entry => entry.id), ["4"]);
 });
 
+test("liste le prochain rendez-vous médical et le prochain rendez-vous kiné", () => {
+  const result = nextAppointmentsByType([
+    ...entries,
+    { id: "m1", status: "planned", type: "medical", date: "2026-06-04", time: "08:00", title: "Médical 1" },
+    { id: "m2", status: "planned", type: "medical", date: "2026-06-05", time: "08:00", title: "Médical 2" },
+    { id: "m3", status: "planned", type: "medical", date: "2026-06-06", time: "08:00", title: "Médical 3" },
+    { id: "m4", status: "planned", type: "medical", date: "2026-06-07", time: "08:00", title: "Médical 4" },
+    { id: "m5", status: "planned", type: "medical", date: "2026-06-08", time: "08:00", title: "Médical 5" },
+    { id: "5", status: "planned", type: "auto", date: "2026-05-28", time: "08:00", title: "Auto" },
+    { id: "6", status: "planned", type: "kine", date: "2026-06-29", time: "09:00", title: "Kiné proche" },
+    { id: "7", status: "planned", type: "kine", date: "2026-06-29", time: "09:00", title: "Kiné loin" }
+  ], "2026-05-27");
+
+  assert.deepEqual(result.map(entry => entry.id), ["4", "6"]);
+});
+
 test("propose un bilan pour un rendez-vous planifié qui est passé", () => {
   assert.deepEqual(reportsToComplete(entries, "2026-05-27").map(entry => entry.id), ["2"]);
 });
@@ -75,9 +94,29 @@ test("utilise le type comme titre lorsqu'il est laissé vide", () => {
     duration: "", pain: "", flexion: "", extension: "", pronation: "", supination: "", details: "", achievement: "", nextStep: ""
   });
   assert.equal(planned.title, "Rendez-vous médical");
-  assert.equal(report.title, "Autorééducation");
+  assert.equal(report.title, "Autorééducation / Impression du jour");
   assert.equal(hasAutomaticTitle(planned), true);
   assert.equal(hasAutomaticTitle({ ...report, title: "Ressenti du soir" }), false);
+});
+
+test("détecte un rendez-vous planifié en doublon", () => {
+  const planned = makePlannedEntry({ type: "kine", date: "2026-06-12", time: "09:00", title: "Cabinet", planningNotes: "Carte vitale" }, "existing");
+  const duplicate = makePlannedEntry({ type: "kine", date: "2026-06-12", time: "09:00", title: " Cabinet ", planningNotes: "Carte   vitale" }, "new");
+  const editedSameEntry = makePlannedEntry({ type: "kine", date: "2026-06-12", time: "09:00", title: "Cabinet", planningNotes: "Carte vitale" }, "existing");
+  const otherSlot = makePlannedEntry({ type: "kine", date: "2026-06-12", time: "10:00", title: "Cabinet", planningNotes: "Carte vitale" }, "new");
+
+  assert.equal(hasDuplicatePlannedEntry([planned], duplicate), true);
+  assert.equal(hasDuplicatePlannedEntry([planned], editedSameEntry), false);
+  assert.equal(hasDuplicatePlannedEntry([planned], otherSlot), false);
+});
+
+test("calcule les cumuls depuis le début des saisies", () => {
+  const result = lifetimeSummary(entries);
+
+  assert.equal(result.reports, 2);
+  assert.equal(result.practices, 2);
+  assert.equal(result.appointments, 0);
+  assert.deepEqual(result.series.map(series => series.total), [2, 2, 0]);
 });
 
 test("préserve les anciennes notes en leur attribuant un statut", () => {

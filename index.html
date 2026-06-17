@@ -103,10 +103,11 @@
             <p id="encouragement-message">Ajoutez une première étape de votre parcours.</p>
           </article>
           <div id="dashboard-cards" class="metrics"></div>
+          <div id="dashboard-trends" class="progress-grid dashboard-trends"></div>
           <article class="card free-entry-card">
-            <p class="eyebrow">Saisie spontanée</p>
-            <h2>Séance libre</h2>
-            <p>Ajoutez un ressenti de fin de journée, une autorééducation ou un progrès non planifié.</p>
+            <p class="eyebrow">Saisies spontanées</p>
+            <h2>Saisies spontanées</h2>
+            <p>Ajoutez une impression de fin de journée, une autorééducation ou un ressenti non planifié.</p>
             <button id="new-free-report" class="primary" type="button">Noter une séance libre</button>
           </article>
           <article class="card">
@@ -162,7 +163,7 @@
               <select id="report-type" required>
                 <option value="kine">Séance de kiné</option>
                 <option value="medical">Rendez-vous médical</option>
-                <option value="auto">Autorééducation</option>
+                <option value="auto">Autorééducation / Impression du jour</option>
                 <option value="progress">Progrès / ressenti</option>
               </select>
             </label>
@@ -224,11 +225,11 @@
             <div id="upcoming-list" class="empty">Aucun rendez-vous à venir.</div>
           </article>
           <article class="card">
-            <h2>Filtrer le calendrier</h2>
+            <h2>Calendrier</h2>
             <div class="calendar-filters" aria-label="Filtrer les types affichés dans le calendrier">
               <button class="calendar-filter active type-kine" data-calendar-type="kine" type="button">Kiné</button>
               <button class="calendar-filter active type-medical" data-calendar-type="medical" type="button">Médical</button>
-              <button class="calendar-filter active type-auto" data-calendar-type="auto" type="button">Auto</button>
+              <button class="calendar-filter active type-auto" data-calendar-type="auto" type="button">Auto / jour</button>
               <button class="calendar-filter active type-progress" data-calendar-type="progress" type="button">Progrès</button>
             </div>
             <div class="month-nav">
@@ -258,7 +259,7 @@
               <select id="filter-type" aria-label="Filtrer par sujet">
                 <option value="">Tous les sujets</option>
                 <option value="kine">Séances de kiné</option>
-                <option value="auto">Autorééducation</option>
+                <option value="auto">Autorééducation / Impression du jour</option>
                 <option value="medical">Rendez-vous médicaux</option>
                 <option value="progress">Progrès / ressentis</option>
               </select>

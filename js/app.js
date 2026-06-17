@@ -5,19 +5,21 @@ import {
   exportIcs,
   filteredEntries,
   hasAutomaticTitle,
+  hasDuplicatePlannedEntry,
   isoToday,
+  lifetimeSummary,
   makePlannedEntry,
   makeReportEntry,
   mobilityProgress,
   monthCells,
   monthLabel,
   monthNow,
+  nextAppointmentsByType,
   newJournal,
   normalizeJournal,
   sevenDaySummary,
   shiftMonth,
-  reportsToComplete,
-  upcomingEntries
+  reportsToComplete
 } from "./domain.js";
 import {
   canonicalPassphrase,
@@ -273,12 +275,22 @@ async function savePlanning(event) {
     planningNotes: $("planning-notes").value
   }, $("planning-id").value);
   const existingIndex = journal.entries.findIndex(item => item.id === entry.id);
+  if (existingIndex < 0 && hasDuplicatePlannedEntry(journal.entries, entry) && !confirmDuplicatePlanning(entry)) {
+    return;
+  }
   if (existingIndex >= 0) journal.entries[existingIndex] = entry;
   else journal.entries.push(entry);
   await persist();
   resetPlanningForm();
   setView("plan");
   notify(existingIndex >= 0 ? "Rendez-vous modifié." : "Rendez-vous planifié.");
+}
+
+function confirmDuplicatePlanning(entry) {
+  const time = entry.time ? ` à ${entry.time}` : "";
+  return window.confirm(
+    `Vous avez déjà saisi un rendez-vous exactement semblable le ${dateLabel(entry.date)}${time}.\n\nAnnuler : ne rien ajouter.\nConfirmer : ajouter quand même ce doublon.`
+  );
 }
 
 async function saveReport(event) {
@@ -358,9 +370,15 @@ function openReport(id = "") {
     $("report-form-title").textContent = entry.status === "completed" ? "Modifier le bilan" : "Faire le bilan";
   } else {
     $("report-type").value = "auto";
-    $("report-title").value = "Autorééducation";
+    $("report-title").value = TYPES.auto;
   }
   setView("report");
+}
+
+function planDay(date) {
+  resetPlanningForm();
+  $("planning-date").value = date;
+  setView("plan");
 }
 
 async function removeEntry(id) {
@@ -374,6 +392,7 @@ function handleEntryAction(event) {
   const button = event.target.closest("button[data-action]");
   if (!button) return;
   if (button.dataset.action === "plan-edit") editPlanning(button.dataset.id);
+  if (button.dataset.action === "plan-day") planDay(button.dataset.date);
   if (button.dataset.action === "report") openReport(button.dataset.id);
   if (button.dataset.action === "delete") removeEntry(button.dataset.id);
 }
@@ -399,16 +418,19 @@ function renderAll() {
 
 function renderDashboard() {
   const summary = sevenDaySummary(journal.entries);
+  const lifetime = lifetimeSummary(journal.entries);
   $("encouragement-title").textContent = summary.title;
   $("encouragement-message").textContent = summary.message;
   $("dashboard-cards").innerHTML = [
-    metric(summary.recentCount, "notes"),
-    metric(summary.practices, "séances"),
-    metric(summary.appointments, "rdv médicaux")
+    metric(lifetime.reports, "bilans depuis le début"),
+    metric(lifetime.practices, "séances depuis le début"),
+    metric(lifetime.appointments, "rdv médicaux depuis le début")
   ].join("");
-  const upcoming = upcomingEntries(journal.entries);
+  $("dashboard-trends").innerHTML = lifetime.series.map(cumulativeCard).join("");
+  const upcoming = nextAppointmentsByType(journal.entries);
+  $("upcoming-list").classList.toggle("empty", !upcoming.length);
   $("upcoming-list").innerHTML = upcoming.length
-    ? upcoming.map(planningCard).join("")
+    ? upcoming.map(upcomingPostit).join("")
     : '<div class="empty">Aucun rendez-vous à venir.</div>';
   const pending = reportsToComplete(journal.entries);
   $("pending-list").innerHTML = pending.length
@@ -418,6 +440,19 @@ function renderDashboard() {
 
 function metric(value, label) {
   return `<div class="metric"><strong>${value}</strong><span>${label}</span></div>`;
+}
+
+function cumulativeCard(series) {
+  const max = Math.max(1, ...series.points.map(point => point.value));
+  const bars = series.points.slice(-10).map(point => {
+    const height = Math.max(8, Math.round((point.value / max) * 100));
+    return `<span class="progress-bar" style="height:${height}%" title="${escapeHtml(dateLabel(point.date))} : ${point.value}"></span>`;
+  }).join("");
+  return `<article class="progress-card compact-progress">
+    <p class="eyebrow">${escapeHtml(series.label)}</p>
+    <strong>${series.total}</strong>
+    <div class="progress-bars compact-bars" aria-hidden="true">${bars || '<span class="progress-bar empty-bar"></span>'}</div>
+  </article>`;
 }
 
 function renderCalendar() {
@@ -465,7 +500,10 @@ function renderCalendarDay(entries) {
   $("calendar-day-title").textContent = `Le ${dateLabel(selectedCalendarDate)}`;
   $("calendar-day-list").innerHTML = dayEntries.length
     ? dayEntries.map(entryCard).join("")
-    : '<div class="empty">Aucune entrée ce jour-là pour les filtres choisis.</div>';
+    : `<div class="empty calendar-empty-day">
+        <p>Aucune entrée ce jour-là pour les filtres choisis.</p>
+        <button class="text-button soft-action" data-action="plan-day" data-date="${selectedCalendarDate}" type="button">Planifier ce jour</button>
+      </div>`;
 }
 
 function renderRecords() {
@@ -601,6 +639,14 @@ function planningCard(entry) {
       <button class="text-button" data-action="plan-edit" data-id="${entry.id}" type="button">Modifier</button>
       <button class="text-button delete" data-action="delete" data-id="${entry.id}" type="button">Supprimer</button>
     </div>
+  </article>`;
+}
+
+function upcomingPostit(entry) {
+  return `<article class="upcoming-postit type-${entry.type}">
+    <p class="eyebrow">${TYPES[entry.type]}</p>
+    <h3>${escapeHtml(entry.title)}</h3>
+    <p>${dateLabel(entry.date)}${entry.time ? ` · ${entry.time}` : ""}</p>
   </article>`;
 }
 

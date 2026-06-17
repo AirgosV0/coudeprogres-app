@@ -22,6 +22,8 @@ La V1 amorce le suivi du progrès avec quatre angles facultatifs dans les bilans
 
 La V1.1 améliore l'ergonomie de l'accueil et de l'historique : les bilans à compléter sont séparés de la saisie spontanée **Séance libre**, les cartes reprennent les couleurs par type, le bouton **Faire le bilan** est adouci, et l'historique est trié par date d'événement puis par type.
 
+La V1.5 compacte le calendrier : seuls les prochains rendez-vous médical et kiné sont rappelés en haut, le détail d'une date vide propose de **Planifier ce jour**, et la planification demande confirmation avant d'ajouter un rendez-vous strictement identique. La rubrique **Bilans** conserve le résumé des sept derniers jours, mais ses compteurs et mini-graphes montrent désormais le cumul depuis le début des saisies.
+
 Les exports CSV et calendrier ne sont pas chiffrés. La sauvegarde `.json`, elle, reste chiffrée.
 
 Cette V1 n'envoie pas les notes à une intelligence artificielle. Les messages d'encouragement sont calculés localement à partir des entrées. Une future fonction d'IA pourra rester optionnelle et préciser les données volontairement transmises.
