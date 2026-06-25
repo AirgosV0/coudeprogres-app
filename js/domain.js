@@ -218,9 +218,9 @@ export function lifetimeSummary(entries, today = isoToday()) {
     practices,
     appointments,
     series: [
-      cumulativeSeries(completed, "Bilans", () => true, month),
-      cumulativeSeries(completed, "Séances", entry => entry.type === "kine" || entry.type === "auto", month),
-      cumulativeSeries(completed, "RDV médicaux", entry => entry.type === "medical", month)
+      { ...cumulativeSeries(completed, "Bilans", () => true, month), tone: "bilan" },
+      { ...cumulativeSeries(completed, "Séances", entry => entry.type === "kine" || entry.type === "auto", month), tone: "session" },
+      { ...cumulativeSeries(completed, "RDV médicaux", entry => entry.type === "medical", month), tone: "medical" }
     ]
   };
 }

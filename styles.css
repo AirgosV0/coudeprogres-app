@@ -1,17 +1,24 @@
 :root {
-  --ink: #2f241d;
-  --muted: #74675d;
-  --teal: #9a5f35;
-  --teal-deep: #5f3b25;
-  --mint: #f3e8dc;
-  --cream: #faf6ee;
+  --ink: #092f3d;
+  --muted: #66727c;
+  --teal: #08b9b7;
+  --teal-deep: #057f8f;
+  --mint: #e5fbfb;
+  --cream: #eefcff;
   --paper: #ffffff;
-  --sun: #d8a13c;
-  --auto: #637f95;
-  --progress: #b56f66;
-  --border: #e2d5c8;
-  --danger: #9f302d;
-  --shadow: 0 8px 25px rgba(74, 47, 28, 0.06);
+  --bilan: #15b9c4;
+  --bilan-soft: #dcf8fb;
+  --session: #45b765;
+  --session-soft: #e5f8e8;
+  --medical: #ff6258;
+  --medical-soft: #ffe8e5;
+  --progress: #0aa7b5;
+  --progress-soft: #e1f7fa;
+  --sun: #ffbd59;
+  --auto: var(--session);
+  --border: #d9eff0;
+  --danger: #d0443d;
+  --shadow: 0 10px 28px rgba(7, 127, 143, 0.1);
   font-family: Inter, "Avenir Next", "Segoe UI", system-ui, sans-serif;
   color: var(--ink);
   background: var(--cream);
@@ -24,7 +31,10 @@
 body {
   margin: 0;
   min-height: 100dvh;
-  background: var(--cream);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(148, 240, 248, 0.65), transparent 24rem),
+    radial-gradient(circle at 92% 18%, rgba(200, 247, 227, 0.8), transparent 18rem),
+    linear-gradient(180deg, #eefdff 0%, var(--cream) 45%, #f8ffff 100%);
 }
 
 .hidden {
@@ -33,8 +43,9 @@ body {
 
 .topbar {
   align-items: center;
-  background: var(--paper);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(217, 239, 240, 0.85);
   display: flex;
   justify-content: space-between;
   padding: calc(1rem + env(safe-area-inset-top)) 1.1rem 0.9rem;
@@ -81,7 +92,10 @@ main {
 }
 
 .hero {
-  background: var(--mint);
+  background:
+    linear-gradient(135deg, rgba(229, 251, 251, 0.95), rgba(255, 255, 255, 0.72)),
+    linear-gradient(135deg, #bff7fb 0%, #e4fff4 100%);
+  border: 1px solid rgba(8, 185, 183, 0.14);
   border-radius: 22px;
   padding: 1.45rem 1.25rem;
 }
@@ -98,7 +112,7 @@ main {
 }
 
 .card {
-  background: var(--paper);
+  background: rgba(255, 255, 255, 0.94);
   border: 1px solid var(--border);
   border-radius: 18px;
   box-shadow: var(--shadow);
@@ -134,7 +148,7 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(154, 95, 53, 0.15);
+  box-shadow: 0 0 0 3px rgba(8, 185, 183, 0.18);
   outline: none;
 }
 
@@ -151,8 +165,9 @@ button {
 }
 
 .primary {
-  background: var(--teal);
+  background: linear-gradient(180deg, #11cfc9 0%, var(--teal) 100%);
   border: 1px solid var(--teal);
+  box-shadow: 0 10px 22px rgba(8, 185, 183, 0.22);
   color: white;
   width: 100%;
 }
@@ -191,7 +206,7 @@ form .text-button {
 }
 
 .danger-button {
-  background: var(--danger);
+  background: linear-gradient(180deg, #ff7068 0%, var(--medical) 100%);
   border-color: var(--danger);
 }
 
@@ -219,13 +234,15 @@ form .text-button {
 }
 
 .tab.active {
-  background: var(--mint);
+  background: var(--bilan-soft);
   color: var(--teal-deep);
 }
 
 .focus {
-  background: var(--teal);
+  background:
+    linear-gradient(105deg, rgba(0, 166, 168, 0.98) 0%, rgba(7, 183, 178, 0.94) 55%, rgba(164, 241, 218, 0.76) 100%);
   border-color: var(--teal);
+  box-shadow: 0 16px 34px rgba(7, 127, 143, 0.18);
   color: white;
 }
 
@@ -259,7 +276,7 @@ form .text-button {
 }
 
 .metric strong {
-  color: var(--teal-deep);
+  color: var(--bilan);
   display: block;
   font-size: 1.5rem;
 }
@@ -364,18 +381,18 @@ summary {
 }
 
 .dot {
-  background: var(--teal);
+  background: var(--bilan);
   border-radius: 100%;
   height: 6px;
   width: 6px;
 }
 
 .dot.medical {
-  background: var(--sun);
+  background: var(--medical);
 }
 
 .dot.auto {
-  background: var(--auto);
+  background: var(--session);
 }
 
 .dot.progress {
@@ -400,7 +417,7 @@ summary {
 }
 
 .calendar-filter.active {
-  background: var(--mint);
+  background: var(--bilan-soft);
   color: var(--teal-deep);
 }
 
@@ -429,9 +446,9 @@ summary {
 }
 
 .tag {
-  background: var(--mint);
+  background: var(--bilan-soft);
   border-radius: 50px;
-  color: var(--teal-deep);
+  color: var(--bilan);
   display: inline-block;
   font-size: 0.72rem;
   margin-right: 0.35rem;
@@ -439,21 +456,21 @@ summary {
 }
 
 .tag.planned {
-  background: #f4edda;
-  color: #725727;
+  background: #eef4f4;
+  color: #6b747a;
 }
 
 .tag.completed {
-  background: #e7f1f8;
-  color: #21586b;
+  background: var(--bilan-soft);
+  color: var(--bilan);
 }
 
 .type-kine {
-  border-left-color: var(--teal);
+  border-left-color: var(--session);
 }
 
 .type-medical {
-  border-left-color: var(--sun);
+  border-left-color: var(--medical);
 }
 
 .type-auto {
@@ -465,23 +482,23 @@ summary {
 }
 
 .type-tag.type-kine {
-  background: #f5e8d9;
-  color: var(--teal-deep);
+  background: var(--session-soft);
+  color: var(--session);
 }
 
 .type-tag.type-medical {
-  background: #f8eed6;
-  color: #725727;
+  background: var(--medical-soft);
+  color: var(--medical);
 }
 
 .type-tag.type-auto {
-  background: #e6eef3;
-  color: #3d5d72;
+  background: var(--session-soft);
+  color: var(--session);
 }
 
 .type-tag.type-progress {
-  background: #f4e7ee;
-  color: #7a3c5c;
+  background: var(--progress-soft);
+  color: var(--progress);
 }
 
 #upcoming-list {
@@ -495,15 +512,16 @@ summary {
 }
 
 .upcoming-postit {
-  background: #fff8ec;
+  background: #f7fffb;
   border: 1px solid var(--border);
-  border-left: 5px solid var(--teal);
+  border-left: 5px solid var(--session);
   border-radius: 14px;
   padding: 0.75rem;
 }
 
 .upcoming-postit.type-medical {
-  border-left-color: var(--sun);
+  background: #fff8f7;
+  border-left-color: var(--medical);
 }
 
 .upcoming-postit h3 {
@@ -543,9 +561,9 @@ summary {
 }
 
 .soft-action {
-  background: var(--mint);
+  background: var(--bilan-soft);
   border-color: transparent;
-  color: var(--teal-deep);
+  color: var(--bilan);
 }
 
 .delete {
@@ -587,7 +605,7 @@ summary {
 }
 
 .progress-card {
-  background: var(--paper);
+  background: rgba(255, 255, 255, 0.95);
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: var(--shadow);
@@ -601,10 +619,28 @@ summary {
 }
 
 .progress-card strong {
-  color: var(--teal-deep);
+  color: var(--bilan);
   display: block;
   font-size: 1.65rem;
   margin-top: 0.45rem;
+}
+
+.dashboard-kind-bilan .eyebrow,
+.dashboard-kind-bilan strong,
+.dashboard-kind-bilan .month-count {
+  color: var(--bilan);
+}
+
+.dashboard-kind-session .eyebrow,
+.dashboard-kind-session strong,
+.dashboard-kind-session .month-count {
+  color: var(--session);
+}
+
+.dashboard-kind-medical .eyebrow,
+.dashboard-kind-medical strong,
+.dashboard-kind-medical .month-count {
+  color: var(--medical);
 }
 
 .compact-progress strong {
@@ -622,7 +658,7 @@ summary {
 }
 
 .angle-gauge {
-  background: #f3ece3;
+  background: #e7f5f6;
   border-radius: 999px;
   height: 0.85rem;
   margin: 0.85rem 0 0.35rem;
@@ -631,7 +667,7 @@ summary {
 }
 
 .angle-gauge-normal {
-  background: rgba(215, 143, 85, 0.5);
+  background: rgba(8, 185, 183, 0.26);
   border-radius: 999px;
   bottom: 0;
   position: absolute;
@@ -639,7 +675,7 @@ summary {
 }
 
 .angle-gauge-value {
-  background: var(--teal-deep);
+  background: var(--teal);
   border: 2px solid var(--paper);
   border-radius: 999px;
   box-shadow: 0 2px 8px rgba(39, 92, 88, 0.22);
@@ -656,12 +692,12 @@ summary {
 }
 
 .empty-progress {
-  background: #f7faf8;
+  background: #f6ffff;
 }
 
 .progress-bars {
   align-items: end;
-  background: linear-gradient(180deg, #f7fbf9 0%, var(--mint) 100%);
+  background: linear-gradient(180deg, #f7ffff 0%, var(--mint) 100%);
   border-radius: 12px;
   display: flex;
   gap: 0.35rem;
@@ -683,10 +719,18 @@ summary {
 }
 
 .progress-bar {
-  background: var(--teal);
+  background: var(--bilan);
   border-radius: 999px 999px 3px 3px;
   flex: 1;
   min-height: 0.35rem;
+}
+
+.dashboard-kind-session .progress-bar {
+  background: var(--session);
+}
+
+.dashboard-kind-medical .progress-bar {
+  background: var(--medical);
 }
 
 .empty-bar {
@@ -721,7 +765,9 @@ summary {
 }
 
 .free-entry-card {
-  background: linear-gradient(135deg, var(--paper) 0%, var(--mint) 100%);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(229, 251, 251, 0.92) 100%),
+    var(--paper);
 }
 
 .free-entry-card p:not(.eyebrow) {
@@ -730,7 +776,7 @@ summary {
 }
 
 .caution {
-  border-left: 4px solid var(--sun);
+  border-left: 4px solid var(--medical);
 }
 
 .toast {
