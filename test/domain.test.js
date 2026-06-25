@@ -111,13 +111,18 @@ test("détecte un rendez-vous planifié en doublon", () => {
 });
 
 test("calcule les cumuls depuis le début des saisies", () => {
-  const result = lifetimeSummary(entries, "2026-05-27");
+  const result = lifetimeSummary([
+    ...entries,
+    { id: "5", status: "completed", type: "auto", date: "2026-05-28", time: "", title: "Auto", details: "", achievement: "", nextStep: "" }
+  ], "2026-05-27");
 
-  assert.equal(result.reports, 2);
-  assert.equal(result.practices, 2);
+  assert.equal(result.reports, 3);
+  assert.equal(result.practices, 3);
   assert.equal(result.appointments, 0);
-  assert.deepEqual(result.series.map(series => series.total), [2, 2, 0]);
-  assert.deepEqual(result.series.map(series => series.monthCount), [1, 1, 0]);
+  assert.deepEqual(result.series.map(series => series.total), [3, 3, 0]);
+  assert.deepEqual(result.series.map(series => series.monthCount), [2, 2, 0]);
+  assert.equal(result.series[0].points.length, 2);
+  assert.equal(result.series[0].points[1].value, 3);
 });
 
 test("préserve les anciennes notes en leur attribuant un statut", () => {

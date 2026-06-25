@@ -437,7 +437,7 @@ function cumulativeCard(series) {
   const max = Math.max(1, ...series.points.map(point => point.value));
   const bars = series.points.map(point => {
     const height = Math.max(8, Math.round((point.value / max) * 100));
-    return `<span class="progress-bar" style="height:${height}%" title="${escapeHtml(dateLabel(point.date))} : ${point.value}"></span>`;
+    return `<span class="progress-bar" style="height:${height}%" title="Semaine du ${escapeHtml(dateLabel(point.date))} : ${point.value}"></span>`;
   }).join("");
   return `<article class="progress-card compact-progress">
     <p class="eyebrow">${escapeHtml(series.label)}</p>

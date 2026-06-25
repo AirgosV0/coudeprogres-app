@@ -265,13 +265,15 @@ export function sevenDaySummary(entries, today = isoToday()) {
 function cumulativeSeries(entries, label, predicate, month) {
   let count = 0;
   let monthCount = 0;
-  const points = entries.map(entry => {
+  const weeklyPoints = new Map();
+  entries.forEach(entry => {
     if (predicate(entry)) {
       count += 1;
       if (entry.date.startsWith(month)) monthCount += 1;
     }
-    return { date: entry.date, value: count };
+    weeklyPoints.set(weekStart(entry.date), count);
   });
+  const points = Array.from(weeklyPoints, ([date, value]) => ({ date, value }));
   return { label, total: count, monthCount, points };
 }
 
@@ -423,6 +425,12 @@ function compareEntriesByEvent(a, b) {
 function inPeriod(iso, start, end) {
   const date = midday(iso);
   return date >= start && date <= end;
+}
+
+function weekStart(iso) {
+  const date = midday(iso);
+  date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+  return localIso(date);
 }
 
 function midday(iso) {
