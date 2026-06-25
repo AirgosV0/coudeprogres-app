@@ -1,10 +1,13 @@
-const CACHE = "coudeprogres-v18";
+const CACHE = "coudeprogres-v19";
 const FILES = [
   "./",
   "./index.html",
   "./styles.css",
   "./manifest.webmanifest",
   "./assets/icon.svg",
+  "./assets/dashboard-bilans.png",
+  "./assets/dashboard-seances.png",
+  "./assets/dashboard-medical.png",
   "./js/app.js",
   "./js/domain.js",
   "./js/crypto-store.js",

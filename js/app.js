@@ -436,11 +436,17 @@ function renderDashboard() {
 function cumulativeCard(series) {
   const max = Math.max(1, ...series.points.map(point => point.value));
   const tone = ["bilan", "session", "medical"].includes(series.tone) ? series.tone : "bilan";
+  const icon = {
+    bilan: "./assets/dashboard-bilans.png",
+    session: "./assets/dashboard-seances.png",
+    medical: "./assets/dashboard-medical.png"
+  }[tone];
   const bars = series.points.map(point => {
     const height = Math.max(8, Math.round((point.value / max) * 100));
     return `<span class="progress-bar" style="height:${height}%" title="Semaine du ${escapeHtml(dateLabel(point.date))} : ${point.value}"></span>`;
   }).join("");
   return `<article class="progress-card compact-progress dashboard-kind-${tone}">
+    <img class="dashboard-card-icon" src="${icon}" alt="" aria-hidden="true">
     <p class="eyebrow">${escapeHtml(series.label)}</p>
     <strong>${series.total}</strong>
     <div class="progress-bars compact-bars" aria-hidden="true">${bars || '<span class="progress-bar empty-bar"></span>'}</div>

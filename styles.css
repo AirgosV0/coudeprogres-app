@@ -616,6 +616,16 @@ summary {
 .compact-progress {
   min-height: auto;
   padding: 0.75rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.dashboard-card-icon {
+  height: 3rem;
+  position: absolute;
+  right: 0.7rem;
+  top: 0.7rem;
+  width: 3rem;
 }
 
 .progress-card strong {
