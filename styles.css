@@ -579,6 +579,13 @@ summary {
   grid-template-columns: repeat(3, 1fr);
 }
 
+.dashboard-trends-title {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin: 0.9rem 0 0.5rem;
+}
+
 .progress-card {
   background: var(--paper);
   border: 1px solid var(--border);
@@ -667,6 +674,12 @@ summary {
   height: 2.4rem;
   margin: 0.45rem 0 0;
   padding: 0.35rem;
+}
+
+.progress-card .month-count {
+  color: var(--muted);
+  font-weight: 700;
+  margin: 0.4rem 0 0;
 }
 
 .progress-bar {

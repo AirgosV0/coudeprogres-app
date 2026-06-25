@@ -207,8 +207,9 @@ export function reportsToComplete(entries, today = isoToday()) {
     .sort(compareEntriesByEvent);
 }
 
-export function lifetimeSummary(entries) {
+export function lifetimeSummary(entries, today = isoToday()) {
   const completed = filteredEntries(entries, { status: "completed" }).reverse();
+  const month = today.slice(0, 7);
   const reports = completed.length;
   const practices = completed.filter(entry => entry.type === "kine" || entry.type === "auto").length;
   const appointments = completed.filter(entry => entry.type === "medical").length;
@@ -217,9 +218,9 @@ export function lifetimeSummary(entries) {
     practices,
     appointments,
     series: [
-      cumulativeSeries(completed, "Bilans", () => true),
-      cumulativeSeries(completed, "Séances", entry => entry.type === "kine" || entry.type === "auto"),
-      cumulativeSeries(completed, "RDV médicaux", entry => entry.type === "medical")
+      cumulativeSeries(completed, "Bilans", () => true, month),
+      cumulativeSeries(completed, "Séances", entry => entry.type === "kine" || entry.type === "auto", month),
+      cumulativeSeries(completed, "RDV médicaux", entry => entry.type === "medical", month)
     ]
   };
 }
@@ -261,13 +262,17 @@ export function sevenDaySummary(entries, today = isoToday()) {
   };
 }
 
-function cumulativeSeries(entries, label, predicate) {
+function cumulativeSeries(entries, label, predicate, month) {
   let count = 0;
+  let monthCount = 0;
   const points = entries.map(entry => {
-    if (predicate(entry)) count += 1;
+    if (predicate(entry)) {
+      count += 1;
+      if (entry.date.startsWith(month)) monthCount += 1;
+    }
     return { date: entry.date, value: count };
   });
-  return { label, total: count, points };
+  return { label, total: count, monthCount, points };
 }
 
 export function monthCells(month, entries, today = isoToday()) {
@@ -326,7 +331,8 @@ export function exportCsv(entries) {
     ["duration", "Durée (minutes)"], ["pain", "Douleur (0-10)"],
     ["flexion", "Flexion (degrés)"], ["extension", "Extension (degrés)"],
     ["pronation", "Pronation (degrés)"], ["supination", "Supination (degrés)"],
-    ["details", "Observations"], ["achievement", "Réussite"], ["nextStep", "Prochaine étape"]
+    ["details", "Observations"], ["achievement", "Réussite"], ["nextStep", "Prochaine étape"],
+    ["sessionPaid", "Séance payée (o/n)"], ["paymentDate", "Date paiement"]
   ];
   const lines = [columns.map(([, label]) => csvCell(label)).join(";")];
   filteredEntries(entries).reverse().forEach(entry => {

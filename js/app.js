@@ -421,11 +421,6 @@ function renderDashboard() {
   const lifetime = lifetimeSummary(journal.entries);
   $("encouragement-title").textContent = summary.title;
   $("encouragement-message").textContent = summary.message;
-  $("dashboard-cards").innerHTML = [
-    metric(lifetime.reports, "bilans depuis le début"),
-    metric(lifetime.practices, "séances depuis le début"),
-    metric(lifetime.appointments, "rdv médicaux depuis le début")
-  ].join("");
   $("dashboard-trends").innerHTML = lifetime.series.map(cumulativeCard).join("");
   const upcoming = nextAppointmentsByType(journal.entries);
   $("upcoming-list").classList.toggle("empty", !upcoming.length);
@@ -438,13 +433,9 @@ function renderDashboard() {
     : '<div class="empty">Aucun bilan en attente.</div>';
 }
 
-function metric(value, label) {
-  return `<div class="metric"><strong>${value}</strong><span>${label}</span></div>`;
-}
-
 function cumulativeCard(series) {
   const max = Math.max(1, ...series.points.map(point => point.value));
-  const bars = series.points.slice(-10).map(point => {
+  const bars = series.points.map(point => {
     const height = Math.max(8, Math.round((point.value / max) * 100));
     return `<span class="progress-bar" style="height:${height}%" title="${escapeHtml(dateLabel(point.date))} : ${point.value}"></span>`;
   }).join("");
@@ -452,6 +443,7 @@ function cumulativeCard(series) {
     <p class="eyebrow">${escapeHtml(series.label)}</p>
     <strong>${series.total}</strong>
     <div class="progress-bars compact-bars" aria-hidden="true">${bars || '<span class="progress-bar empty-bar"></span>'}</div>
+    <p class="month-count">+ ${series.monthCount} ce mois</p>
   </article>`;
 }
 

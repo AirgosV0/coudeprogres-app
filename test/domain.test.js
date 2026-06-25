@@ -111,12 +111,13 @@ test("détecte un rendez-vous planifié en doublon", () => {
 });
 
 test("calcule les cumuls depuis le début des saisies", () => {
-  const result = lifetimeSummary(entries);
+  const result = lifetimeSummary(entries, "2026-05-27");
 
   assert.equal(result.reports, 2);
   assert.equal(result.practices, 2);
   assert.equal(result.appointments, 0);
   assert.deepEqual(result.series.map(series => series.total), [2, 2, 0]);
+  assert.deepEqual(result.series.map(series => series.monthCount), [1, 1, 0]);
 });
 
 test("préserve les anciennes notes en leur attribuant un statut", () => {
@@ -172,6 +173,8 @@ test("les exports incluent les données attendues", () => {
   assert.match(exportCsv(entries), /Planifié/);
   assert.match(exportCsv(entries), /Pronation \(degrés\)/);
   assert.match(exportCsv(entries), /Supination \(degrés\)/);
+  assert.match(exportCsv(entries), /Séance payée \(o\/n\)/);
+  assert.match(exportCsv(entries), /Date paiement/);
   assert.match(exportIcs(entries), /Contrôle/);
   assert.doesNotMatch(exportIcs(entries), /Mobilité/);
 });
