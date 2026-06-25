@@ -209,10 +209,11 @@ export function reportsToComplete(entries, today = isoToday()) {
 
 export function lifetimeSummary(entries, today = isoToday()) {
   const completed = filteredEntries(entries, { status: "completed" }).reverse();
+  const medicalAppointments = filteredEntries(entries, { type: "medical" }).reverse();
   const month = today.slice(0, 7);
   const reports = completed.length;
   const practices = completed.filter(entry => entry.type === "kine" || entry.type === "auto").length;
-  const appointments = completed.filter(entry => entry.type === "medical").length;
+  const appointments = medicalAppointments.length;
   return {
     reports,
     practices,
@@ -220,7 +221,7 @@ export function lifetimeSummary(entries, today = isoToday()) {
     series: [
       { ...cumulativeSeries(completed, "Bilans", () => true, month), tone: "bilan" },
       { ...cumulativeSeries(completed, "Séances", entry => entry.type === "kine" || entry.type === "auto", month), tone: "session" },
-      { ...cumulativeSeries(completed, "RDV médicaux", entry => entry.type === "medical", month), tone: "medical" }
+      { ...cumulativeSeries(medicalAppointments, "RDV médicaux", () => true, month), tone: "medical" }
     ]
   };
 }

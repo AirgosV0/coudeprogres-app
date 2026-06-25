@@ -621,11 +621,17 @@ summary {
 }
 
 .dashboard-card-icon {
-  height: 3rem;
+  height: 2.25rem;
   position: absolute;
-  right: 0.7rem;
-  top: 0.7rem;
-  width: 3rem;
+  right: 0.55rem;
+  top: 0.55rem;
+  width: 2.25rem;
+}
+
+.compact-progress .eyebrow {
+  line-height: 1.15;
+  min-height: 2.3rem;
+  padding-right: 2.45rem;
 }
 
 .progress-card strong {

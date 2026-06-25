@@ -118,8 +118,8 @@ test("calcule les cumuls depuis le début des saisies", () => {
 
   assert.equal(result.reports, 3);
   assert.equal(result.practices, 3);
-  assert.equal(result.appointments, 0);
-  assert.deepEqual(result.series.map(series => series.total), [3, 3, 0]);
+  assert.equal(result.appointments, 1);
+  assert.deepEqual(result.series.map(series => series.total), [3, 3, 1]);
   assert.deepEqual(result.series.map(series => series.monthCount), [2, 2, 0]);
   assert.equal(result.series[0].points.length, 2);
   assert.equal(result.series[0].points[1].value, 3);
