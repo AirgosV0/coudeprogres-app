@@ -215,7 +215,7 @@ form .text-button {
   border-top: 1px solid var(--border);
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   left: 0;
   padding: 0.35rem 0.2rem calc(0.35rem + env(safe-area-inset-bottom));
   position: fixed;
